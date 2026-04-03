@@ -10,6 +10,7 @@ export default function App() {
   const [isMatchPollOpen, setIsMatchPollOpen] = useState(false);
   const [selectedVote, setSelectedVote] = useState<'win' | 'draw' | 'loss' | null>(null);
   const [selectedSponsorClub, setSelectedSponsorClub] = useState('Eagles RFC');
+  const [routeHash, setRouteHash] = useState(() => window.location.hash || '#/');
 
   const tickerItems = [
     'FT Ewes 36-27 She Wolves | 28 Mar',
@@ -96,18 +97,41 @@ export default function App() {
   ];
 
   const rugbySponsorLogos = [
-    'macron',
-    'HSBC',
-    'NILE',
-    'Roke Telkom',
-    'Uganda Breweries',
-    'KCB',
-    'Airtel',
-    'NBS Sport',
+    { name: 'Adidas', src: 'https://www.vectorlogo.zone/logos/adidas/adidas-ar21.svg' },
+    { name: 'HSBC', src: 'https://www.vectorlogo.zone/logos/hsbc/hsbc-ar21.svg' },
+    { name: 'Airtel', src: 'https://www.vectorlogo.zone/logos/airtel/airtel-ar21.svg' },
+    { name: 'KCB', src: 'https://www.vectorlogo.zone/logos/kcbgroup/kcbgroup-ar21.svg' },
+    { name: 'Heineken', src: 'https://www.vectorlogo.zone/logos/heineken/heineken-ar21.svg' },
+    { name: 'Guinness', src: 'https://www.vectorlogo.zone/logos/guinness/guinness-ar21.svg' },
+    { name: 'Mastercard', src: 'https://www.vectorlogo.zone/logos/mastercard/mastercard-ar21.svg' },
+    { name: 'Emirates', src: 'https://www.vectorlogo.zone/logos/emirates/emirates-ar21.svg' },
   ];
 
   const getRegionPanel = (title: string) =>
     desktopRegionPanels.find((panel) => panel.title === title) ?? desktopRegionPanels[0];
+
+  const merchandisePages = {
+    '#/shop/matchday-wear': {
+      title: 'Matchday Wear',
+      subtitle: 'Official Rugby In Uganda matchday pieces for fans, players, and club communities.',
+      image: '/slider/one.jpg',
+      items: ['Match Jerseys', 'Training Tops', 'Sideline Jackets', 'Supporter Tees'],
+    },
+    '#/shop/fan-essentials': {
+      title: 'Fan Essentials',
+      subtitle: 'Everyday supporter gear built for match weekends, watch parties, and travel.',
+      image: '/slider/two.jpeg',
+      items: ['Caps', 'Scarves', 'Supporter Tees', 'Flags'],
+    },
+    '#/shop/accessories': {
+      title: 'Accessories',
+      subtitle: 'Small finishing pieces that carry the Rugby In Uganda identity wherever you go.',
+      image: '/slider/three.webp',
+      items: ['Water Bottles', 'Wristbands', 'Key Holders', 'Travel Bags'],
+    },
+  } as const;
+
+  const activeMerchPage = merchandisePages[routeHash as keyof typeof merchandisePages];
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
@@ -116,6 +140,15 @@ export default function App() {
 
     return () => window.clearInterval(intervalId);
   }, [heroSlides.length]);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      setRouteHash(window.location.hash || '#/');
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   useEffect(() => {
     const matchKickoff = new Date('2026-04-05T16:00:00+03:00').getTime();
@@ -179,6 +212,56 @@ export default function App() {
       count: pollVotes.loss,
     },
   ];
+
+  if (activeMerchPage) {
+    return (
+      <div className="min-h-screen bg-[#0a0c10] text-white">
+        <section className="relative overflow-hidden">
+          <div className="absolute inset-0">
+            <img src={activeMerchPage.image} alt={activeMerchPage.title} className="h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(6,8,12,0.9),rgba(11,45,100,0.58))]" />
+          </div>
+
+          <div className="relative mx-auto flex min-h-screen max-w-6xl flex-col justify-center px-4 py-16 sm:px-6">
+            <a
+              href="#/"
+              className="mb-8 inline-flex w-fit items-center justify-center rounded-full border border-white/15 bg-white/8 px-5 py-3 text-xs font-black uppercase tracking-[0.22em] text-white backdrop-blur-md transition-colors hover:bg-white/14"
+            >
+              Back Home
+            </a>
+
+            <div className="max-w-3xl rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.05))] p-8 shadow-[0_24px_70px_rgba(0,0,0,0.3)] backdrop-blur-xl sm:p-10">
+              <div className="text-xs font-semibold uppercase tracking-[0.34em] text-[#d6a327]">Official Merchandise</div>
+              <h1 className="mt-4 text-4xl font-serif uppercase tracking-[0.06em] text-white sm:text-6xl">
+                {activeMerchPage.title}
+              </h1>
+              <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/78">
+                {activeMerchPage.subtitle}
+              </p>
+
+              <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                {activeMerchPage.items.map((item) => (
+                  <div
+                    key={item}
+                    className="rounded-2xl border border-white/10 bg-black/20 px-5 py-4 text-base font-black uppercase tracking-[0.08em] text-white"
+                  >
+                    {item}
+                  </div>
+                ))}
+              </div>
+
+              <a
+                href="https://wa.me/256773207919"
+                className="mt-10 inline-flex items-center justify-center rounded-[4px] bg-[#ef2d2d] px-10 py-4 text-base font-black uppercase tracking-[0.08em] text-white shadow-[0_14px_30px_rgba(239,45,45,0.22)] transition-colors hover:bg-[#ff3b3b]"
+              >
+                Order via WhatsApp
+              </a>
+            </div>
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#050505] text-white">
@@ -401,8 +484,8 @@ export default function App() {
         {/* Booking Bar */}
         <div className="absolute right-0 bottom-0 left-0 w-full bg-[#3a4740]/90 py-6 backdrop-blur-md">
           <div className="container mx-auto flex justify-center px-4">
-            <div className="flex w-full flex-wrap items-center gap-4 md:w-auto">
-              <div className="relative w-full sm:w-[calc(50%-0.5rem)] lg:w-auto">
+            <div className="flex w-full items-center gap-3 overflow-x-auto whitespace-nowrap pb-1 md:w-auto md:flex-wrap md:justify-center md:overflow-visible md:whitespace-normal">
+              <div className="relative w-[210px] shrink-0 md:w-auto">
                 <select defaultValue="" className="w-full appearance-none border border-white/60 bg-transparent px-4 py-3 text-lg uppercase text-white focus:border-white focus:outline-none md:py-2 md:text-sm lg:w-48">
                   <option value="" disabled hidden className="text-black">SHOP</option>
                   <option className="text-black">RIU</option>
@@ -410,7 +493,7 @@ export default function App() {
                 </select>
                 <ChevronDown size={18} className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 transform text-white/90 md:size-[14px]" />
               </div>
-              <div className="relative w-full sm:w-[calc(50%-0.5rem)] lg:w-auto">
+              <div className="relative w-[210px] shrink-0 md:w-auto">
                 <select defaultValue="" className="w-full appearance-none border border-white/60 bg-transparent px-4 py-3 text-lg uppercase text-white focus:border-white focus:outline-none md:py-2 md:text-sm lg:w-48">
                   <option value="" disabled hidden className="text-black">EVENTS</option>
                   <option className="text-black">ON GOING</option>
@@ -418,7 +501,7 @@ export default function App() {
                 </select>
                 <ChevronDown size={18} className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 transform text-white/90 md:size-[14px]" />
               </div>
-              <div className="relative w-full sm:w-[calc(50%-0.5rem)] lg:w-auto">
+              <div className="relative w-[210px] shrink-0 md:w-auto">
                 <select defaultValue="" className="w-full appearance-none border border-white/60 bg-transparent px-4 py-3 text-lg uppercase text-white focus:border-white focus:outline-none md:py-2 md:text-sm lg:w-40">
                   <option value="" disabled hidden className="text-black">TABLE STANDINGS</option>
                   <option className="text-black">PREMIERSHIP</option>
@@ -429,7 +512,7 @@ export default function App() {
                 </select>
                 <ChevronDown size={18} className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 transform text-white/90 md:size-[14px]" />
               </div>
-              <div className="relative w-full sm:w-[calc(50%-0.5rem)] lg:w-auto">
+              <div className="relative w-[210px] shrink-0 md:w-auto">
                 <select defaultValue="" className="w-full appearance-none border border-white/60 bg-transparent px-4 py-3 text-lg uppercase text-white focus:border-white focus:outline-none md:py-2 md:text-sm lg:w-40">
                   <option value="" disabled hidden className="text-black">NEWS</option>
                   <option className="text-black">ALL NEWS</option>
@@ -437,11 +520,11 @@ export default function App() {
                 </select>
                 <ChevronDown size={18} className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 transform text-white/90 md:size-[14px]" />
               </div>
-              <div className="relative w-full sm:w-[calc(50%-0.5rem)] lg:w-auto">
+              <div className="relative w-[210px] shrink-0 md:w-auto">
                 <input type="text" placeholder="CALENDAR" className="w-full border border-white/60 bg-transparent px-4 py-3 text-lg uppercase text-white placeholder-white/90 focus:border-white focus:outline-none md:py-2 md:text-sm lg:w-40" />
                 <Calendar size={18} className="absolute top-1/2 right-4 -translate-y-1/2 transform text-white/90 md:size-[14px]" />
               </div>
-              <button className="w-full whitespace-nowrap bg-[#d93838] px-6 py-3 text-lg font-bold text-white transition-colors hover:bg-red-700 md:w-auto md:px-8 md:py-2.5 md:text-sm">
+              <button className="w-[210px] shrink-0 whitespace-nowrap bg-[#d93838] px-6 py-3 text-lg font-bold text-white transition-colors hover:bg-red-700 md:w-auto md:px-8 md:py-2.5 md:text-sm">
                 Partner With Us
               </button>
             </div>
@@ -807,12 +890,24 @@ export default function App() {
               through our official kit.
             </p>
             <div className="relative z-10 mt-8 flex flex-wrap items-center justify-center gap-3">
-              <span className="rounded-full border border-[#0b2d64]/15 bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-[#0b2d64]">
+              <a
+                href="#/shop/matchday-wear"
+                className="rounded-full border border-[#0b2d64]/15 bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-[#0b2d64] transition-colors hover:bg-[#0b2d64] hover:text-white"
+              >
                 Matchday Wear
-              </span>
-              <span className="rounded-full border border-[#0b2d64]/15 bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-[#0b2d64]">
+              </a>
+              <a
+                href="#/shop/fan-essentials"
+                className="rounded-full border border-[#0b2d64]/15 bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-[#0b2d64] transition-colors hover:bg-[#0b2d64] hover:text-white"
+              >
                 Fan Essentials
-              </span>
+              </a>
+              <a
+                href="#/shop/accessories"
+                className="rounded-full border border-[#0b2d64]/15 bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-[#0b2d64] transition-colors hover:bg-[#0b2d64] hover:text-white"
+              >
+                Accessories
+              </a>
             </div>
             <a
               href="#"
@@ -971,26 +1066,21 @@ export default function App() {
       </section>
 
       {/* Rugby Sponsors Marquee */}
-      <section className="overflow-hidden border-t border-b border-white/10 bg-[#0a0c10] py-12 text-white">
-        <div className="mx-auto mb-8 max-w-5xl px-4 text-center sm:px-6">
-          <div className="text-xs font-semibold uppercase tracking-[0.34em] text-[#d6a327]">Backing The Game</div>
-          <h2 className="mt-3 text-3xl font-serif uppercase tracking-[0.08em] text-white sm:text-4xl">
-            Companies Sponsoring Rugby
-          </h2>
-        </div>
-
+      <section className="overflow-hidden border-t border-b border-white/10 bg-[#0a0c10] py-8 text-white sm:py-10">
         <div className="sponsor-marquee">
           <div className="sponsor-marquee__track">
             {[0, 1].map((group) => (
               <div key={group} className="sponsor-marquee__group">
                 {rugbySponsorLogos.map((logo) => (
                   <div
-                    key={`${group}-${logo}`}
-                    className="flex h-[92px] min-w-[190px] items-center justify-center rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.11),rgba(255,255,255,0.04))] px-8 text-center shadow-[0_12px_28px_rgba(0,0,0,0.22)] backdrop-blur-xl"
+                    key={`${group}-${logo.name}`}
+                    className="flex h-[96px] min-w-[210px] items-center justify-center rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.11),rgba(255,255,255,0.04))] px-8 text-center shadow-[0_12px_28px_rgba(0,0,0,0.22)] backdrop-blur-xl"
                   >
-                    <span className="text-xl font-black uppercase tracking-[0.08em] text-white sm:text-2xl">
-                      {logo}
-                    </span>
+                    <img
+                      src={logo.src}
+                      alt={logo.name}
+                      className="h-12 w-auto max-w-[150px] object-contain brightness-0 invert"
+                    />
                   </div>
                 ))}
               </div>
