@@ -74,3 +74,79 @@ h1, h2, h3, h4, h5, h6 {
     transform: translateX(0);
   }
 }
+
+section:not(.section-font-fixed) :is(.text-\[10px\], .text-\[11px\], .text-\[11\.5px\], .text-xs) {
+  font-size: 0.9375rem !important;
+}
+
+section:not(.section-font-fixed) :is(.sm\:text-sm, .md\:text-sm) {
+  font-size: 1.09375rem !important;
+}
+
+section:not(.section-font-fixed) :is(.text-sm) {
+  font-size: 1.09375rem !important;
+}
+
+section:not(.section-font-fixed) :is(.sm\:text-base, .md\:text-base) {
+  font-size: 1.25rem !important;
+}
+
+section:not(.section-font-fixed) :is(.text-base) {
+  font-size: 1.25rem !important;
+}
+
+section:not(.section-font-fixed) :is(.sm\:text-lg, .md\:text-lg) {
+  font-size: 1.40625rem !important;
+}
+
+section:not(.section-font-fixed) :is(.text-lg) {
+  font-size: 1.40625rem !important;
+}
+
+section:not(.section-font-fixed) :is(.sm\:text-xl, .md\:text-xl) {
+  font-size: 1.5625rem !important;
+}
+
+section:not(.section-font-fixed) :is(.text-xl) {
+  font-size: 1.5625rem !important;
+}
+
+section:not(.section-font-fixed) :is(.sm\:text-2xl, .md\:text-2xl) {
+  font-size: 1.875rem !important;
+}
+
+section:not(.section-font-fixed) :is(.text-2xl) {
+  font-size: 1.875rem !important;
+}
+
+section:not(.section-font-fixed) :is(.sm\:text-3xl, .md\:text-3xl) {
+  font-size: 2.34375rem !important;
+}
+
+section:not(.section-font-fixed) :is(.text-3xl) {
+  font-size: 2.34375rem !important;
+}
+
+section:not(.section-font-fixed) :is(.sm\:text-4xl, .md\:text-4xl) {
+  font-size: 3rem !important;
+}
+
+section:not(.section-font-fixed) :is(.text-4xl) {
+  font-size: 3rem !important;
+}
+
+section:not(.section-font-fixed) :is(.sm\:text-5xl, .md\:text-5xl) {
+  font-size: 3.75rem !important;
+}
+
+section:not(.section-font-fixed) :is(.text-5xl) {
+  font-size: 3.75rem !important;
+}
+
+section:not(.section-font-fixed) :is(.sm\:text-6xl, .md\:text-6xl) {
+  font-size: 4.5rem !important;
+}
+
+section:not(.section-font-fixed) :is(.text-6xl) {
+  font-size: 4.5rem !important;
+}

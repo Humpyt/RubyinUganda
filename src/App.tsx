@@ -312,27 +312,27 @@ export default function App() {
             </div>
           </div>
           <nav className="hidden md:flex md:justify-end">
-            <div className="flex items-center gap-8 px-2 py-2 text-sm font-semibold text-white">
+            <div className="flex items-center gap-9 px-2 py-2 text-lg font-semibold text-white">
               <a href="#" className="flex items-center gap-2 transition-colors hover:text-gray-300">
                 <span>Latest</span>
-                <ChevronDown size={14} />
+                <ChevronDown size={18} />
               </a>
               <a href="#" className="flex items-center gap-2 transition-colors hover:text-gray-300">
                 <span>Teams</span>
-                <ChevronDown size={14} />
+                <ChevronDown size={18} />
               </a>
               <a href="#" className="transition-colors hover:text-gray-300">Age Grade</a>
               <a href="#" className="flex items-center gap-2 transition-colors hover:text-gray-300">
                 <span>Tournaments</span>
-                <ChevronDown size={14} />
+                <ChevronDown size={18} />
               </a>
               <a href="#" className="flex items-center gap-2 transition-colors hover:text-gray-300">
                 <span>RIU</span>
-                <ChevronDown size={14} />
+                <ChevronDown size={18} />
               </a>
               <a href="#" className="flex items-center gap-2 transition-colors hover:text-gray-300">
                 <span>Fixture & Results</span>
-                <ChevronDown size={14} />
+                <ChevronDown size={18} />
               </a>
             </div>
           </nav>
@@ -388,7 +388,7 @@ export default function App() {
         <div className={`absolute left-0 right-0 z-20 px-4 pb-4 md:hidden ${isMobileMenuOpen ? 'top-[300px]' : 'top-[84px]'}`}>
           <div className="space-y-3">
             {regionCards.map((item) => (
-              <div key={item.title} className="border border-white/50 bg-transparent">
+              <div key={item.title} className="overflow-hidden rounded-[6px] border border-white/45 bg-black/45 shadow-[0_10px_28px_rgba(0,0,0,0.28)] backdrop-blur-md">
                 {(() => {
                   const regionPanel = getRegionPanel(item.title);
 
@@ -397,11 +397,11 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setOpenMobileRegion((value) => (value === item.title ? null : item.title))}
-                  className="flex w-full items-center justify-between px-4 py-4 text-left"
+                  className="flex w-full items-center justify-between bg-[linear-gradient(90deg,rgba(0,0,0,0.34),rgba(255,255,255,0.04))] px-4 py-4 text-left"
                 >
                   <div>
-                    <div className="text-lg font-semibold text-white">{item.title}</div>
-                    <div className="mt-1 text-[10px] uppercase tracking-[0.18em] text-white/70">{item.subtitle}</div>
+                    <div className="text-lg font-semibold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]">{item.title}</div>
+                    <div className="mt-1 text-xs uppercase tracking-[0.18em] text-white/90">{item.subtitle}</div>
                   </div>
                   <ChevronDown
                     size={18}
@@ -409,7 +409,7 @@ export default function App() {
                   />
                 </button>
                 {openMobileRegion === item.title ? (
-                  <div className="border-t border-white/20 bg-black/70">
+                  <div className="border-t border-white/20 bg-black/85">
                     <div className="grid grid-cols-[120px_1fr]">
                       <div className="px-4 py-3">
                         <div className="flex min-h-[312px] flex-col">
@@ -450,8 +450,8 @@ export default function App() {
             <div className="grid grid-cols-6 divide-x divide-white/20 text-center text-white">
               {desktopRegionPanels.map((item) => (
                 <div key={item.title} className="group relative cursor-pointer py-4 transition-colors hover:bg-white/10">
-                  <div className="mb-1 text-xs font-bold tracking-widest">{item.title.toUpperCase()}</div>
-                  <div className="text-[10px] tracking-wider text-gray-300">{item.subtitle.toUpperCase()}</div>
+                  <div className="mb-1 text-sm font-bold tracking-widest">{item.title.toUpperCase()}</div>
+                  <div className="text-xs tracking-wider text-gray-300">{item.subtitle.toUpperCase()}</div>
                   <div
                     className={
                       item.align === 'right'
@@ -484,7 +484,7 @@ export default function App() {
           <div className="container mx-auto flex justify-center px-4">
             <div className="flex w-full items-center gap-3 overflow-x-auto whitespace-nowrap pb-1 md:w-auto md:flex-wrap md:justify-center md:overflow-visible md:whitespace-normal">
               <div className="relative w-[210px] shrink-0 md:w-auto">
-                <select defaultValue="" className="w-full appearance-none border border-white/60 bg-transparent px-4 py-3 text-lg uppercase text-white focus:border-white focus:outline-none md:py-2 md:text-sm lg:w-48">
+                <select defaultValue="" className="w-full appearance-none border border-white/60 bg-transparent px-4 py-3 text-lg uppercase text-white focus:border-white focus:outline-none md:py-2 md:text-base lg:w-48">
                   <option value="" disabled hidden className="text-black">SHOP</option>
                   <option className="text-black">RIU</option>
                   <option className="text-black">CLUBS</option>
@@ -492,7 +492,7 @@ export default function App() {
                 <ChevronDown size={18} className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 transform text-white/90 md:size-[14px]" />
               </div>
               <div className="relative w-[210px] shrink-0 md:w-auto">
-                <select defaultValue="" className="w-full appearance-none border border-white/60 bg-transparent px-4 py-3 text-lg uppercase text-white focus:border-white focus:outline-none md:py-2 md:text-sm lg:w-48">
+                <select defaultValue="" className="w-full appearance-none border border-white/60 bg-transparent px-4 py-3 text-lg uppercase text-white focus:border-white focus:outline-none md:py-2 md:text-base lg:w-48">
                   <option value="" disabled hidden className="text-black">EVENTS</option>
                   <option className="text-black">ON GOING</option>
                   <option className="text-black">UP COMING</option>
@@ -500,7 +500,7 @@ export default function App() {
                 <ChevronDown size={18} className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 transform text-white/90 md:size-[14px]" />
               </div>
               <div className="relative w-[210px] shrink-0 md:w-auto">
-                <select defaultValue="" className="w-full appearance-none border border-white/60 bg-transparent px-4 py-3 text-lg uppercase text-white focus:border-white focus:outline-none md:py-2 md:text-sm lg:w-40">
+                <select defaultValue="" className="w-full appearance-none border border-white/60 bg-transparent px-4 py-3 text-lg uppercase text-white focus:border-white focus:outline-none md:py-2 md:text-base lg:w-40">
                   <option value="" disabled hidden className="text-black">TABLE STANDINGS</option>
                   <option className="text-black">PREMIERSHIP</option>
                   <option className="text-black">EASTERN</option>
@@ -511,7 +511,7 @@ export default function App() {
                 <ChevronDown size={18} className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 transform text-white/90 md:size-[14px]" />
               </div>
               <div className="relative w-[210px] shrink-0 md:w-auto">
-                <select defaultValue="" className="w-full appearance-none border border-white/60 bg-transparent px-4 py-3 text-lg uppercase text-white focus:border-white focus:outline-none md:py-2 md:text-sm lg:w-40">
+                <select defaultValue="" className="w-full appearance-none border border-white/60 bg-transparent px-4 py-3 text-lg uppercase text-white focus:border-white focus:outline-none md:py-2 md:text-base lg:w-40">
                   <option value="" disabled hidden className="text-black">NEWS</option>
                   <option className="text-black">ALL NEWS</option>
                   <option className="text-black">LATEST NEWS</option>
@@ -519,10 +519,10 @@ export default function App() {
                 <ChevronDown size={18} className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 transform text-white/90 md:size-[14px]" />
               </div>
               <div className="relative w-[210px] shrink-0 md:w-auto">
-                <input type="text" placeholder="CALENDAR" className="w-full border border-white/60 bg-transparent px-4 py-3 text-lg uppercase text-white placeholder-white/90 focus:border-white focus:outline-none md:py-2 md:text-sm lg:w-40" />
+                <input type="text" placeholder="CALENDAR" className="w-full border border-white/60 bg-transparent px-4 py-3 text-lg uppercase text-white placeholder-white/90 focus:border-white focus:outline-none md:py-2 md:text-base lg:w-40" />
                 <Calendar size={18} className="absolute top-1/2 right-4 -translate-y-1/2 transform text-white/90 md:size-[14px]" />
               </div>
-              <button className="w-[210px] shrink-0 whitespace-nowrap bg-[#d93838] px-6 py-3 text-lg font-bold text-white transition-colors hover:bg-red-700 md:w-auto md:px-8 md:py-2.5 md:text-sm">
+              <button className="w-[210px] shrink-0 whitespace-nowrap bg-[#d93838] px-6 py-3 text-lg font-bold text-white transition-colors hover:bg-red-700 md:w-auto md:px-8 md:py-2.5 md:text-base">
                 Partner With Us
               </button>
             </div>
@@ -531,7 +531,7 @@ export default function App() {
       </section>
 
       {/* Testimonials Section */}
-      <section className={`relative overflow-hidden py-20 sm:py-28 ${isMatchPollOpen ? 'pb-40 sm:pb-28' : ''}`}>
+      <section className={`section-font-fixed relative overflow-hidden py-20 sm:py-28 ${isMatchPollOpen ? 'pb-96 sm:pb-28' : ''}`}>
         <div className="absolute inset-0">
           <img
             src="/slider/two.jpeg"
@@ -545,7 +545,7 @@ export default function App() {
           <div
             className={`relative transition-transform duration-700 ${
               isMatchPollOpen
-                ? 'min-h-[1320px] sm:min-h-[900px] lg:min-h-[920px]'
+                ? 'min-h-[1800px] sm:min-h-[980px] lg:min-h-[1120px]'
                 : 'min-h-[860px] sm:min-h-[640px] lg:min-h-[660px]'
             }`}
             style={{ transformStyle: 'preserve-3d', transform: isMatchPollOpen ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
@@ -633,53 +633,53 @@ export default function App() {
               className={isMatchPollOpen ? 'pointer-events-auto absolute inset-0' : 'pointer-events-none absolute inset-0'}
               style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
             >
-              <div className="bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(247,242,230,0.92))] p-4 shadow-[0_24px_60px_rgba(0,0,0,0.18)] sm:p-8">
-                <div className="overflow-hidden rounded-[28px] border border-[#161616] bg-[linear-gradient(180deg,#f7f1e6_0%,#efe7d8_100%)] text-black shadow-[0_24px_50px_rgba(0,0,0,0.28)]">
-                  <div className="border-b border-black/10 bg-[linear-gradient(90deg,rgba(255,255,255,0.55),rgba(255,255,255,0.18))] px-5 py-5 sm:px-7">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(247,242,230,0.92))] p-4 shadow-[0_24px_60px_rgba(0,0,0,0.18)] sm:p-5 lg:p-6">
+                <div className="overflow-hidden rounded-[24px] border border-[#161616] bg-[linear-gradient(180deg,#f7f1e6_0%,#efe7d8_100%)] text-black shadow-[0_24px_50px_rgba(0,0,0,0.28)] sm:rounded-[28px]">
+                  <div className="border-b border-black/10 bg-[linear-gradient(90deg,rgba(255,255,255,0.55),rgba(255,255,255,0.18))] px-4 py-4 sm:px-5 sm:py-4 lg:px-6 lg:py-5">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                        <div className="text-[11px] font-black uppercase tracking-[0.34em] text-black/55">Interactive Vote</div>
-                        <h2 className="mt-2 text-xl font-black uppercase tracking-[0.28em] sm:text-2xl">Match Poll</h2>
-                        <p className="mt-2 max-w-xl text-sm text-black/62 sm:text-base">
+                        <div className="text-[11px] font-black uppercase tracking-[0.22em] text-black/55">Interactive Vote</div>
+                        <h2 className="mt-1 text-lg font-black uppercase tracking-[0.16em] sm:mt-2 sm:text-2xl lg:text-3xl">Match Poll</h2>
+                        <p className="mt-1 max-w-xl text-[12px] leading-relaxed text-black/62 sm:mt-2 sm:text-base lg:text-lg">
                           Cast your pick for the result and watch the live percentages update instantly.
                         </p>
                     </div>
-                      <div className="grid grid-cols-2 gap-3 sm:min-w-[260px]">
-                        <div className="rounded-2xl border border-black/10 bg-white/55 px-4 py-3 text-center">
-                          <div className="text-[10px] font-black uppercase tracking-[0.22em] text-black/48">Total Votes</div>
-                          <div className="mt-2 text-2xl font-black">{totalVotes}</div>
+                      <div className="grid grid-cols-2 gap-2 sm:min-w-[260px] sm:gap-3">
+                        <div className="rounded-xl border border-black/10 bg-white/55 px-3 py-2 text-center sm:rounded-2xl sm:px-3 sm:py-2.5 lg:px-4 lg:py-3">
+                          <div className="text-[11px] font-black uppercase tracking-[0.18em] text-black/48">Total Votes</div>
+                          <div className="mt-1 text-xl font-black sm:mt-1 sm:text-2xl lg:mt-2 lg:text-3xl">{totalVotes}</div>
                         </div>
-                        <div className="rounded-2xl border border-black/10 bg-white/55 px-4 py-3 text-center">
-                          <div className="text-[10px] font-black uppercase tracking-[0.22em] text-black/48">Active Polls</div>
-                          <div className="mt-2 text-2xl font-black">1</div>
+                        <div className="rounded-xl border border-black/10 bg-white/55 px-3 py-2 text-center sm:rounded-2xl sm:px-3 sm:py-2.5 lg:px-4 lg:py-3">
+                          <div className="text-[11px] font-black uppercase tracking-[0.18em] text-black/48">Active Polls</div>
+                          <div className="mt-1 text-xl font-black sm:mt-1 sm:text-2xl lg:mt-2 lg:text-3xl">1</div>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="p-5 sm:p-7">
-                    <div className="mb-6 rounded-[24px] border border-black/12 bg-[linear-gradient(135deg,#f4a71d_0%,#ffbf43_100%)] px-6 py-6 text-center shadow-[inset_0_-3px_0_rgba(0,0,0,0.12),0_16px_24px_rgba(244,167,29,0.22)]">
-                      <div className="text-[11px] font-black uppercase tracking-[0.28em] text-black/65">Match Date</div>
-                      <div className="mt-2 text-3xl font-black uppercase sm:text-4xl">Sun 05/04</div>
+                  <div className="p-4 sm:p-5 lg:p-7">
+                    <div className="mb-4 rounded-[18px] border border-black/12 bg-[linear-gradient(135deg,#f4a71d_0%,#ffbf43_100%)] px-4 py-4 text-center shadow-[inset_0_-3px_0_rgba(0,0,0,0.12),0_16px_24px_rgba(244,167,29,0.22)] sm:mb-5 sm:rounded-[22px] sm:px-5 sm:py-5 lg:mb-6 lg:rounded-[24px] lg:px-6 lg:py-6">
+                      <div className="text-[11px] font-black uppercase tracking-[0.18em] text-black/65 sm:text-[11px] sm:tracking-[0.28em]">Match Date</div>
+                      <div className="mt-1 text-3xl font-black uppercase sm:mt-2 sm:text-4xl lg:text-5xl">Sun 05/04</div>
                     </div>
 
-                    <div className="mb-5 flex flex-col gap-3 border-b border-black/10 pb-5 sm:flex-row sm:items-end sm:justify-between">
+                    <div className="mb-4 flex flex-col gap-2 border-b border-black/10 pb-4 sm:mb-5 sm:gap-3 sm:pb-5 sm:flex-row sm:items-end sm:justify-between">
                       <div>
-                        <div className="text-[11px] font-black uppercase tracking-[0.24em] text-black/45">Prediction Prompt</div>
-                        <p className="mt-2 text-2xl font-black uppercase sm:text-3xl">Life Guard Rams To Win</p>
+                        <div className="text-[11px] font-black uppercase tracking-[0.14em] text-black/45 sm:text-[11px] sm:tracking-[0.24em]">Prediction Prompt</div>
+                        <p className="mt-1 text-xl font-black uppercase sm:mt-2 sm:text-3xl lg:text-4xl">Life Guard Rams To Win</p>
                       </div>
-                      <div className="rounded-full border border-black/10 bg-white/55 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-black/65">
+                      <div className="rounded-full border border-black/10 bg-white/55 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.08em] text-black/65 sm:px-4 sm:py-2 sm:text-sm sm:tracking-[0.16em]">
                         Live Community Pick
                       </div>
                     </div>
 
-                    <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    <div className="mb-4 grid grid-cols-1 gap-2 sm:mb-5 sm:grid-cols-3 sm:gap-2.5 lg:mb-6 lg:gap-3">
                       {voteOptions.map((option) => (
                         <button
                           key={option.key}
                           type="button"
                           onClick={() => handleVote(option.key)}
-                          className={`rounded-2xl border px-6 py-4 text-base font-black uppercase tracking-[0.08em] transition-all duration-200 ${
+                          className={`rounded-lg border px-3 py-2 text-[12px] font-black uppercase tracking-[0.03em] transition-all duration-200 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-base sm:tracking-[0.06em] lg:px-6 lg:py-4 lg:text-lg lg:tracking-[0.08em] ${
                             selectedVote === option.key
                               ? option.key === 'win'
                                 ? 'border-black bg-black text-white shadow-[0_12px_24px_rgba(0,0,0,0.18)]'
@@ -694,7 +694,7 @@ export default function App() {
                           }`}
                         >
                           <div>{option.label}</div>
-                          <div className={`mt-1 text-[11px] font-bold uppercase tracking-[0.18em] ${
+                          <div className={`mt-0.5 text-[9px] font-bold uppercase tracking-[0.06em] sm:text-[11px] sm:tracking-[0.14em] lg:text-xs lg:tracking-[0.18em] ${
                             selectedVote === option.key ? 'opacity-80' : 'opacity-55'
                           }`}>
                             {selectedVote === option.key ? 'Selected' : 'Tap To Vote'}
@@ -703,11 +703,11 @@ export default function App() {
                       ))}
                     </div>
 
-                    <p className="mb-5 rounded-2xl border border-black/8 bg-white/45 px-4 py-3 text-sm font-bold uppercase tracking-[0.16em] text-black/62">
+                    <p className="mb-4 rounded-md border border-black/8 bg-white/45 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.05em] text-black/62 sm:mb-5 sm:rounded-2xl sm:px-4 sm:py-2.5 sm:text-sm sm:tracking-[0.12em] lg:px-4 lg:py-3 lg:text-base lg:tracking-[0.16em]">
                       {selectedVote ? 'Your vote is active. Tap another option to change it.' : 'Tap one option to cast your vote.'}
                     </p>
 
-                    <div className="space-y-4">
+                    <div className="space-y-2 sm:space-y-3 lg:space-y-4">
                       {voteOptions.map((option) => {
                         const percentage = totalVotes === 0 ? 0 : Math.round((option.count / totalVotes) * 100);
                         const barClass =
@@ -718,12 +718,12 @@ export default function App() {
                               : 'bg-white';
 
                         return (
-                          <div key={`result-${option.key}`} className="rounded-[22px] border border-black/10 bg-white/45 px-4 py-4 sm:px-5">
-                            <div className="mb-3 flex items-center justify-between gap-3">
-                              <span className="text-lg font-black uppercase">{option.label}</span>
-                              <span className="text-base font-black">{percentage}% | {option.count}</span>
+                          <div key={`result-${option.key}`} className="rounded-[12px] border border-black/10 bg-white/45 px-3 py-2 sm:rounded-[20px] sm:px-4 sm:py-3 lg:rounded-[22px] lg:px-5 lg:py-4">
+                            <div className="mb-1.5 flex items-center justify-between gap-2 sm:mb-2">
+                              <span className="text-[12px] font-black uppercase sm:text-lg lg:text-xl">{option.label}</span>
+                              <span className="text-[10px] font-black sm:text-base lg:text-lg">{percentage}% | {option.count}</span>
                             </div>
-                            <div className="h-4 overflow-hidden rounded-full border border-black/12 bg-white/80">
+                            <div className="h-1 overflow-hidden rounded-full border border-black/12 bg-white/80 sm:h-3 lg:h-4">
                               <div
                                 className={`h-full transition-all duration-300 ${barClass}`}
                                 style={{ width: `${percentage}%` }}
@@ -737,7 +737,7 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => setIsMatchPollOpen(false)}
-                      className="mt-6 inline-flex w-full items-center justify-center rounded-2xl bg-[#111] px-6 py-4 text-sm font-black uppercase tracking-[0.18em] text-white transition-colors hover:bg-[#222]"
+                      className="mt-3 inline-flex w-full items-center justify-center rounded-md bg-[#111] px-4 py-2 text-[9px] font-black uppercase tracking-[0.08em] text-white transition-colors hover:bg-[#222] sm:mt-5 sm:rounded-2xl sm:py-3 sm:text-sm sm:tracking-[0.14em] lg:mt-6 lg:py-4 lg:text-base lg:tracking-[0.18em]"
                     >
                       Back To Match
                     </button>
@@ -750,178 +750,244 @@ export default function App() {
       </section>
 
       {/* Activities Section */}
-      <section className="relative overflow-hidden bg-[#050505] py-16 sm:py-24">
-        <div className="absolute inset-0 opacity-40">
-          <div className="absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-[#d6a327]/18 blur-3xl" />
-          <div className="absolute right-0 bottom-0 h-64 w-64 rounded-full bg-[#0f4aa6]/16 blur-3xl" />
-        </div>
+      <section className="relative overflow-hidden bg-[#050505] py-18 sm:py-24">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(214,163,39,0.14),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(15,74,166,0.18),transparent_28%)]" />
+        <div className="absolute inset-x-0 top-0 h-40 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),transparent)]" />
 
-        <div className="relative mb-16 px-4 text-center">
-          <p className="mb-3 font-serif text-lg italic text-[#c5b998]">Grow Your Brand With Rugby In Uganda</p>
-          <h2 className="mb-6 font-serif text-3xl tracking-wide sm:text-4xl" style={{ color: '#ffffff' }}>
-            ADVERTISE YOUR BUSINESS WITH US
-          </h2>
-          <div className="mx-auto h-[2px] w-12 bg-[#d6a327]"></div>
-          <p className="mx-auto mt-6 max-w-3xl text-base leading-relaxed text-gray-300 sm:text-lg">
-            Reach over 50,000 views every month through Rugby in Uganda across fixtures, results, polls, news, and partner features.
-          </p>
-          <p className="mx-auto mt-4 max-w-3xl text-sm leading-relaxed text-[#d6caa5] sm:text-base">
-            Advertising fees help us keep kids in school and continue supporting rugby pathways in our communities.
-          </p>
-          <div className="mx-auto mt-8 grid max-w-3xl grid-cols-1 gap-3 text-left sm:grid-cols-3">
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 backdrop-blur-sm">
-              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-white/50">Monthly Reach</div>
-              <div className="mt-2 text-3xl font-black text-white">50K+</div>
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="mx-auto max-w-4xl text-center">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#d6a327]/20 bg-white/6 px-5 py-2.5 text-xs font-black uppercase tracking-[0.22em] text-[#f1cf75] backdrop-blur-md">
+              Premium Advertising
             </div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 backdrop-blur-sm">
-              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-white/50">Audience</div>
-              <div className="mt-2 text-3xl font-black text-white">Fans, Clubs</div>
+            <p className="mt-5 font-serif text-xl italic text-[#f1cf75] sm:text-2xl">Put Your Brand Where Rugby Culture Lives</p>
+            <h2
+              className="mx-auto mt-4 max-w-5xl font-serif text-4xl tracking-[0.03em] text-[#fff7e6] sm:text-6xl"
+              style={{ textShadow: '0 6px 18px rgba(0,0,0,0.45)' }}
+            >
+              Advertise With A Format That Makes Your Logo Look Established
+            </h2>
+            <p className="mx-auto mt-6 max-w-4xl text-lg leading-relaxed text-white/92 sm:text-xl">
+              This space is designed for serious sponsors. Your business can appear across premium logo placements, branded features, matchday visibility, and long-term partner storytelling around Rugby In Uganda.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-5 md:grid-cols-3">
+            <div className="rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] px-6 py-6 shadow-[0_18px_40px_rgba(0,0,0,0.24)] backdrop-blur-md">
+              <div className="text-xs font-black uppercase tracking-[0.2em] text-white/45">Monthly Reach</div>
+              <div className="mt-3 text-5xl font-black text-white">50K+</div>
+              <div className="mt-3 text-lg leading-relaxed text-white/82">Across fixtures, results, polls, feature stories, and partner mentions.</div>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 backdrop-blur-sm">
-              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-white/50">Placement</div>
-              <div className="mt-2 text-3xl font-black text-white">Worldwide</div>
+            <div className="rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] px-6 py-6 shadow-[0_18px_40px_rgba(0,0,0,0.24)] backdrop-blur-md">
+              <div className="text-xs font-black uppercase tracking-[0.2em] text-white/45">Audience Fit</div>
+              <div className="mt-3 text-5xl font-black text-white">Fans, Clubs</div>
+              <div className="mt-3 text-lg leading-relaxed text-white/82">A community built around sport, events, schools, and loyal supporter networks.</div>
+            </div>
+            <div className="rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] px-6 py-6 shadow-[0_18px_40px_rgba(0,0,0,0.24)] backdrop-blur-md">
+              <div className="text-xs font-black uppercase tracking-[0.2em] text-white/45">Brand Value</div>
+              <div className="mt-3 text-5xl font-black text-white">Worldwide</div>
+              <div className="mt-3 text-lg leading-relaxed text-white/82">A polished presentation that makes local and global sponsors look at home.</div>
             </div>
           </div>
-        </div>
 
-        <div className="container relative mx-auto flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pb-3 md:grid md:grid-cols-2 md:gap-8 md:overflow-visible md:pb-0 lg:grid-cols-4">
-          <div className="group flex aspect-square min-w-[280px] snap-center flex-col overflow-hidden rounded-[28px] border border-white/10 bg-[#111315] text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.35)] md:min-w-0">
-            <div className="mb-6 h-44 overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&q=80&w=800" alt="Website banners" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+          <div className="mt-12 grid gap-6 lg:grid-cols-4">
+            <div className="group relative overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,#121418_0%,#0a0b0d_100%)] p-6 shadow-[0_24px_50px_rgba(0,0,0,0.3)] transition-transform duration-300 hover:-translate-y-1">
+              <div className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#d6a327_0%,#ef2d2d_100%)]" />
+              <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.03))] p-5">
+                <div className="text-xs font-black uppercase tracking-[0.18em] text-white/55">Logo Preview Area</div>
+                <div className="mt-4 flex h-36 items-center justify-center rounded-[18px] border border-dashed border-white/16 bg-black/25 px-4 text-center text-2xl font-black uppercase tracking-[0.16em] text-white/92">
+                  Your Logo Here
+                </div>
+                <div className="mt-4 grid grid-cols-2 gap-2 text-xs font-bold uppercase tracking-[0.12em] text-white/70">
+                  <div className="rounded-full border border-white/10 px-3 py-2.5 text-center">Homepage</div>
+                  <div className="rounded-full border border-white/10 px-3 py-2.5 text-center">Hero Slots</div>
+                </div>
+              </div>
+              <div className="mt-6 text-xs font-black uppercase tracking-[0.24em] text-[#f1cf75]">Premium Placement</div>
+              <h3 className="mt-3 font-serif text-3xl leading-tight text-white">Homepage Banner Presence</h3>
+              <p className="mt-4 text-lg leading-relaxed text-white/82">
+                Best for brands that want immediate visual authority with logo-led exposure in high-traffic positions.
+              </p>
             </div>
-            <div className="flex flex-1 flex-col px-6 pb-6">
-              <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#d6a327]">Premium Placement</div>
-              <h3 className="mb-4 font-serif text-xl leading-snug text-white">Website Banners<br />That Get Seen</h3>
-              <p className="text-sm leading-relaxed text-gray-400">
-              Put your brand in front of rugby fans on our homepage, match pages, and high-traffic sections.
+
+            <div className="group relative overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,#121418_0%,#0a0b0d_100%)] p-6 shadow-[0_24px_50px_rgba(0,0,0,0.3)] transition-transform duration-300 hover:-translate-y-1">
+              <div className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#0f4aa6_0%,#d6a327_100%)]" />
+              <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.03))] p-5">
+                <div className="text-xs font-black uppercase tracking-[0.18em] text-white/55">Editorial Style</div>
+                <div className="mt-4 rounded-[18px] border border-white/10 bg-[linear-gradient(135deg,rgba(15,74,166,0.22),rgba(255,255,255,0.04))] px-4 py-6 text-left">
+                  <div className="text-sm font-black uppercase tracking-[0.18em] text-white/65">Presented By</div>
+                  <div className="mt-3 text-2xl font-black uppercase tracking-[0.08em] text-white">Your Brand Story</div>
+                  <div className="mt-2 text-lg leading-relaxed text-white/82">Campaigns, interviews, and feature-led visibility.</div>
+                </div>
+              </div>
+              <div className="mt-6 text-xs font-black uppercase tracking-[0.24em] text-[#f1cf75]">Brand Storytelling</div>
+              <h3 className="mt-3 font-serif text-3xl leading-tight text-white">Sponsored Features That Feel Premium</h3>
+              <p className="mt-4 text-lg leading-relaxed text-white/82">
+                Ideal for companies that want more than impressions and need a story-rich presence people remember.
+              </p>
+            </div>
+
+            <div className="group relative overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,#121418_0%,#0a0b0d_100%)] p-6 shadow-[0_24px_50px_rgba(0,0,0,0.3)] transition-transform duration-300 hover:-translate-y-1">
+              <div className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#ef2d2d_0%,#ff9b45_100%)]" />
+              <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.03))] p-5">
+                <div className="text-xs font-black uppercase tracking-[0.18em] text-white/55">Matchday Visibility</div>
+                <div className="mt-4 grid gap-2">
+                  <div className="rounded-[16px] border border-white/10 bg-white/5 px-4 py-4 text-base font-black uppercase tracking-[0.14em] text-white/92">Logo In Fixtures</div>
+                  <div className="rounded-[16px] border border-white/10 bg-white/5 px-4 py-4 text-base font-black uppercase tracking-[0.14em] text-white/92">Poll Sponsorship</div>
+                  <div className="rounded-[16px] border border-white/10 bg-white/5 px-4 py-4 text-base font-black uppercase tracking-[0.14em] text-white/92">Top Match Coverage</div>
+                </div>
+              </div>
+              <div className="mt-6 text-xs font-black uppercase tracking-[0.24em] text-[#f1cf75]">Matchday Exposure</div>
+              <h3 className="mt-3 font-serif text-3xl leading-tight text-white">Be Seen Where Attention Peaks</h3>
+              <p className="mt-4 text-lg leading-relaxed text-white/82">
+                Great for companies that want their logo next to fixtures, predictions, big games, and fan activity.
+              </p>
+            </div>
+
+            <div className="group relative overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,#121418_0%,#0a0b0d_100%)] p-6 shadow-[0_24px_50px_rgba(0,0,0,0.3)] transition-transform duration-300 hover:-translate-y-1">
+              <div className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#d6a327_0%,#0f4aa6_100%)]" />
+              <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.03))] p-5">
+                <div className="text-xs font-black uppercase tracking-[0.18em] text-white/55">Corporate Fit</div>
+                <div className="mt-4 flex h-36 items-center justify-center rounded-[18px] border border-white/10 bg-[linear-gradient(135deg,rgba(214,163,39,0.16),rgba(15,74,166,0.12))] px-5 text-center">
+                  <div className="text-xl font-black uppercase tracking-[0.14em] text-white">Built For Serious Partners</div>
+                </div>
+              </div>
+              <div className="mt-6 text-xs font-black uppercase tracking-[0.24em] text-[#f1cf75]">Business Growth</div>
+              <h3 className="mt-3 font-serif text-3xl leading-tight text-white">A Better-Looking Home For Sponsors</h3>
+              <p className="mt-4 text-lg leading-relaxed text-white/82">
+                A sharper, more professional environment that helps businesses picture their brand here with confidence.
               </p>
             </div>
           </div>
 
-          <div className="group flex aspect-square min-w-[280px] snap-center flex-col overflow-hidden rounded-[28px] border border-white/10 bg-[#111315] text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.35)] md:min-w-0">
-            <div className="mb-6 h-44 overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&q=80&w=800" alt="Sponsored campaigns" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
-            </div>
-            <div className="flex flex-1 flex-col px-6 pb-6">
-              <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#d6a327]">Brand Storytelling</div>
-              <h3 className="mb-4 font-serif text-xl leading-snug text-white">Sponsored Features<br />And Campaigns</h3>
-              <p className="text-sm leading-relaxed text-gray-400">
-              Launch partner stories, campaign highlights, and branded content that speaks to the rugby community.
-              </p>
-            </div>
-          </div>
-
-          <div className="group flex aspect-square min-w-[280px] snap-center flex-col overflow-hidden rounded-[28px] border border-white/10 bg-[#111315] text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.35)] md:min-w-0">
-            <div className="mb-6 h-44 overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&q=80&w=800" alt="Matchday visibility" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
-            </div>
-            <div className="flex flex-1 flex-col px-6 pb-6">
-              <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#d6a327]">Matchday Exposure</div>
-              <h3 className="mb-4 font-serif text-xl leading-snug text-white">Matchday Visibility<br />For Your Brand</h3>
-              <p className="text-sm leading-relaxed text-gray-400">
-              Get placement around fixtures, live-style score sections, polls, and top match content.
-              </p>
+          <div className="mt-12 flex flex-col items-center justify-center gap-4 text-center">
+            <a
+              href="#"
+              className="inline-flex items-center justify-center rounded-full bg-[linear-gradient(90deg,#d6a327_0%,#efbf45_100%)] px-12 py-5 text-base font-black uppercase tracking-[0.22em] text-black shadow-[0_20px_36px_rgba(214,163,39,0.24)] transition-transform hover:-translate-y-0.5"
+            >
+              Advertise With Us
+            </a>
+            <div className="text-xs font-bold uppercase tracking-[0.22em] text-white/42">
+              Premium presentation for logo-driven partnerships
             </div>
           </div>
-
-          <div className="group flex aspect-square min-w-[280px] snap-center flex-col overflow-hidden rounded-[28px] border border-white/10 bg-[#111315] text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.35)] md:min-w-0">
-            <div className="mb-6 h-44 overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=800" alt="Partner growth" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
-            </div>
-            <div className="flex flex-1 flex-col px-6 pb-6">
-              <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#d6a327]">Business Growth</div>
-              <h3 className="mb-4 font-serif text-xl leading-snug text-white">Partner With Us<br />And Scale Reach</h3>
-              <p className="text-sm leading-relaxed text-gray-400">
-              We can help position your business in front of players, fans, clubs, schools, and sponsors.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="relative mt-10 px-4 text-center">
-          <a
-            href="#"
-            className="inline-flex items-center justify-center rounded-full border border-[#d6a327]/60 bg-[#d6a327] px-8 py-4 text-sm font-black uppercase tracking-[0.22em] text-black transition-colors hover:bg-[#e3b84b]"
-          >
-            Advertise With Us
-          </a>
         </div>
       </section>
 
       {/* Promo Section */}
-      <section className="relative overflow-hidden bg-[#ece7dc] px-4 py-14 sm:px-6 sm:py-20">
-        <div className="absolute inset-0 opacity-60">
-          <div className="absolute -top-16 left-8 h-48 w-48 rounded-full bg-[#0b2d64]/10 blur-3xl" />
-          <div className="absolute right-10 bottom-0 h-56 w-56 rounded-full bg-[#ef2d2d]/10 blur-3xl" />
+      <section className="section-font-fixed relative overflow-hidden bg-[#e5dccb] px-4 py-14 sm:px-6 sm:py-20">
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-38"
+          style={{ backgroundImage: "url('/slider/two.jpeg')" }}
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(241,235,222,0.68)_0%,rgba(229,220,203,0.72)_100%)]" />
+        <div className="absolute inset-0 opacity-70">
+          <div className="absolute -left-8 top-8 h-44 w-44 rounded-full bg-[#0b2d64]/10 blur-3xl sm:h-56 sm:w-56" />
+          <div className="absolute right-0 top-1/4 h-40 w-40 rounded-full bg-[#ef2d2d]/10 blur-3xl sm:h-52 sm:w-52" />
+          <div className="absolute bottom-0 left-1/3 h-44 w-44 rounded-full bg-[#d6a327]/12 blur-3xl sm:h-60 sm:w-60" />
         </div>
 
-        <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-6 lg:grid-cols-[1fr_1.05fr_1fr]">
-          <div className="group relative aspect-[4/5] overflow-hidden rounded-[10px] bg-white shadow-[0_16px_40px_rgba(0,0,0,0.08)] lg:min-h-[520px]">
-            <img
-              src="/slider/two.jpeg"
-              alt="Rugby players together"
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0b2d64]/25 via-transparent to-transparent" />
+        <div className="relative mx-auto max-w-[88rem]">
+          <div className="mb-10 text-center sm:mb-12">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#0b2d64]/12 bg-white/70 px-4 py-2 text-[11px] font-black uppercase tracking-[0.22em] text-[#0b2d64] shadow-[0_10px_20px_rgba(11,45,100,0.08)] backdrop-blur-sm">
+              Official Kit Drop
+            </div>
           </div>
 
-          <div className="relative flex min-h-[620px] flex-col items-center justify-center overflow-hidden rounded-[10px] border border-white/60 bg-[linear-gradient(180deg,#f8f6f1_0%,#ece7dc_100%)] px-8 py-10 text-center shadow-[0_20px_45px_rgba(0,0,0,0.10)] sm:min-h-[520px]">
-            <div className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#0b2d64_0%,#ef2d2d_50%,#d6a327_100%)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(11,45,100,0.06),transparent_45%)]" />
-            <div className="relative z-10 mb-6 flex items-center gap-5 text-[#111]">
-              <div className="text-4xl font-black tracking-tight text-[#0b2d64]">RIU</div>
-              <div className="h-12 w-px bg-[#999]" />
-              <div className="text-lg font-black uppercase tracking-[0.18em] text-[#1a1a1a]">Rugby In Uganda</div>
-            </div>
-            <div className="relative z-10 text-center font-serif uppercase leading-[0.92] text-[#0b2d64]">
-              <div className="text-4xl font-black sm:text-5xl">Official</div>
-              <div className="mt-2 inline-block bg-[#416ed8] px-3 py-1 text-white">
-                <span className="text-4xl font-black sm:text-5xl">Merchandise</span>
+          <div className="grid max-w-[78rem] grid-cols-1 gap-6 md:grid-cols-[0.98fr_1.22fr_0.98fr] md:items-stretch lg:gap-8">
+            <div className="group relative flex min-h-[430px] flex-col overflow-hidden rounded-[32px] border border-white/15 bg-[radial-gradient(circle_at_top,#2b2b32_0%,#0d0d10_72%)] p-5 shadow-[0_24px_60px_rgba(0,0,0,0.22)] sm:min-h-[540px] sm:p-6">
+              <div className="absolute left-4 top-4 z-20 rounded-full border border-white/12 bg-white/8 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-white/80 backdrop-blur-md">
+                Black Edition
               </div>
-              <div className="mt-3 text-4xl font-black sm:text-5xl">Rugby In</div>
-              <div className="mt-1 text-4xl font-black sm:text-5xl">Uganda</div>
+              <div className="absolute inset-x-0 bottom-0 h-32 bg-[linear-gradient(180deg,transparent_0%,rgba(11,45,100,0.22)_100%)]" />
+              <div className="relative mt-10 flex flex-1 items-center justify-center sm:mt-12">
+                <img
+                  src="/shop/black.jpeg"
+                  alt="Black Rugby In Uganda merchandise"
+                  className="h-full max-h-[380px] w-full object-contain object-center transition-transform duration-700 group-hover:scale-[1.04] sm:max-h-[500px]"
+                />
+              </div>
+              <div className="relative z-10 mt-5 flex items-end justify-between text-white">
+                <div>
+                  <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/55">Supporter Jersey</div>
+                  <div className="mt-2 text-2xl font-black uppercase tracking-[0.06em]">RIU Black</div>
+                </div>
+                <div className="rounded-full border border-white/12 bg-white/8 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-white/78">
+                  New
+                </div>
+              </div>
             </div>
-            <div className="relative z-10 mx-auto mt-5 h-[3px] w-16 bg-[#ef2d2d]" />
-            <p className="relative z-10 mt-8 max-w-md text-xl leading-relaxed text-[#11386f]">
-              Support Rugby in Uganda every day
-              <br />
-              through our official kit.
-            </p>
-            <div className="relative z-10 mt-8 flex flex-wrap items-center justify-center gap-3">
-              <a
-                href="#/shop/matchday-wear"
-                className="rounded-full border border-[#0b2d64]/15 bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-[#0b2d64] transition-colors hover:bg-[#0b2d64] hover:text-white"
-              >
-                Matchday Wear
-              </a>
-              <a
-                href="#/shop/fan-essentials"
-                className="rounded-full border border-[#0b2d64]/15 bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-[#0b2d64] transition-colors hover:bg-[#0b2d64] hover:text-white"
-              >
-                Fan Essentials
-              </a>
-              <a
-                href="#/shop/accessories"
-                className="rounded-full border border-[#0b2d64]/15 bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-[#0b2d64] transition-colors hover:bg-[#0b2d64] hover:text-white"
-              >
-                Accessories
-              </a>
-            </div>
-            <a
-              href="#"
-              className="relative z-10 mt-10 inline-flex items-center justify-center rounded-[4px] bg-[#ef2d2d] px-10 py-4 text-base font-black uppercase tracking-[0.08em] text-white shadow-[0_14px_30px_rgba(239,45,45,0.22)] transition-colors hover:bg-[#ff3b3b]"
-            >
-              I Support My Team
-            </a>
-          </div>
 
-          <div className="group relative aspect-[4/5] overflow-hidden rounded-[10px] bg-white shadow-[0_16px_40px_rgba(0,0,0,0.08)] lg:min-h-[520px]">
-            <img
-              src="/slider/one.jpg"
-              alt="Rugby player ready for action"
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#ef2d2d]/18 via-transparent to-transparent" />
+            <div className="relative flex min-h-[520px] flex-col overflow-hidden rounded-[34px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,250,244,0.95)_0%,rgba(243,236,224,0.92)_100%)] px-6 py-10 text-center shadow-[0_24px_60px_rgba(0,0,0,0.12)] sm:min-h-[680px] sm:px-10 sm:py-12">
+              <div className="absolute inset-x-0 top-0 h-1.5 bg-[linear-gradient(90deg,#0b2d64_0%,#ef2d2d_54%,#d6a327_100%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(11,45,100,0.08),transparent_48%)]" />
+              <div className="absolute right-6 top-6 hidden h-24 w-24 rounded-full border border-[#0b2d64]/8 bg-white/40 md:block" />
+
+              <div className="relative z-10 mb-6 flex items-center justify-center gap-3 text-[#111] sm:mb-8 sm:gap-4">
+                <div className="text-4xl font-black tracking-tight text-[#0b2d64] sm:text-5xl">RIU</div>
+                <div className="h-12 w-px bg-[#9b9b9b] sm:h-14" />
+                <div className="text-base font-black uppercase tracking-[0.16em] text-[#1a1a1a] sm:text-lg">Rugby In Uganda</div>
+              </div>
+
+              <div className="relative z-10 mx-auto max-w-lg">
+                <div className="text-xs font-black uppercase tracking-[0.28em] text-[#0b2d64]/56">Official Merchandise</div>
+                <h2 className="mt-5 font-serif text-[2.45rem] leading-[0.95] font-black uppercase text-[#0b2d64] sm:text-[3.5rem]">
+                  Matchday Style
+                </h2>
+                <p className="mt-5 text-base leading-relaxed text-[#11386f]/82 sm:text-lg">
+                  Designed for supporters, club communities, and everyday wear with a look rooted in Rugby In Uganda.
+                </p>
+              </div>
+
+              <div className="relative z-10 mt-8 grid grid-cols-3 gap-3 text-left sm:mt-10 sm:gap-4">
+                <div className="rounded-2xl border border-[#0b2d64]/10 bg-white/70 px-4 py-4 shadow-[0_10px_20px_rgba(11,45,100,0.05)]">
+                  <div className="text-[10px] font-black uppercase tracking-[0.18em] text-[#0b2d64]/52">Fit</div>
+                  <div className="mt-2 text-base font-black uppercase text-[#0b2d64]">Sport</div>
+                </div>
+                <div className="rounded-2xl border border-[#0b2d64]/10 bg-white/70 px-4 py-4 shadow-[0_10px_20px_rgba(11,45,100,0.05)]">
+                  <div className="text-[10px] font-black uppercase tracking-[0.18em] text-[#0b2d64]/52">Style</div>
+                  <div className="mt-2 text-base font-black uppercase text-[#0b2d64]">Bold</div>
+                </div>
+                <div className="rounded-2xl border border-[#0b2d64]/10 bg-white/70 px-4 py-4 shadow-[0_10px_20px_rgba(11,45,100,0.05)]">
+                  <div className="text-[10px] font-black uppercase tracking-[0.18em] text-[#0b2d64]/52">Drop</div>
+                  <div className="mt-2 text-base font-black uppercase text-[#0b2d64]">2026</div>
+                </div>
+              </div>
+
+              <div className="relative z-10 mt-8 flex flex-col items-center gap-3 sm:mt-10">
+                <a
+                  href="#"
+                  className="inline-flex min-w-[260px] items-center justify-center rounded-full bg-[linear-gradient(90deg,#ef2d2d_0%,#ff4c3f_100%)] px-10 py-4 text-base font-black uppercase tracking-[0.16em] text-white shadow-[0_18px_34px_rgba(239,45,45,0.24)] transition-transform hover:-translate-y-0.5"
+                >
+                  I Support My Team
+                </a>
+                <div className="text-xs font-bold uppercase tracking-[0.22em] text-[#0b2d64]/52">
+                  Wear the badge. Back the game.
+                </div>
+              </div>
+            </div>
+
+            <div className="group relative flex min-h-[430px] flex-col overflow-hidden rounded-[32px] border border-white/15 bg-[radial-gradient(circle_at_top,#26272c_0%,#08080b_74%)] p-5 shadow-[0_24px_60px_rgba(0,0,0,0.22)] sm:min-h-[540px] sm:p-6">
+              <div className="absolute left-4 top-4 z-20 rounded-full border border-white/12 bg-white/8 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-white/80 backdrop-blur-md">
+                White Edition
+              </div>
+              <div className="absolute inset-x-0 bottom-0 h-32 bg-[linear-gradient(180deg,transparent_0%,rgba(239,45,45,0.2)_100%)]" />
+              <div className="relative mt-10 flex flex-1 items-center justify-center sm:mt-12">
+                <img
+                  src="/shop/white.jpeg"
+                  alt="White Rugby In Uganda merchandise"
+                  className="h-full max-h-[380px] w-full object-contain object-center transition-transform duration-700 group-hover:scale-[1.04] sm:max-h-[500px]"
+                />
+              </div>
+              <div className="relative z-10 mt-5 flex items-end justify-between text-white">
+                <div>
+                  <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/55">Supporter Jersey</div>
+                  <div className="mt-2 text-2xl font-black uppercase tracking-[0.06em]">RIU White</div>
+                </div>
+                <div className="rounded-full border border-white/12 bg-white/8 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-white/78">
+                  Clean
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
