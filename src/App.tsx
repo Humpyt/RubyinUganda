@@ -97,14 +97,12 @@ export default function App() {
   ];
 
   const rugbySponsorLogos = [
-    { name: 'Adidas', src: 'https://www.vectorlogo.zone/logos/adidas/adidas-ar21.svg' },
-    { name: 'HSBC', src: 'https://www.vectorlogo.zone/logos/hsbc/hsbc-ar21.svg' },
-    { name: 'Airtel', src: 'https://www.vectorlogo.zone/logos/airtel/airtel-ar21.svg' },
-    { name: 'KCB', src: 'https://www.vectorlogo.zone/logos/kcbgroup/kcbgroup-ar21.svg' },
-    { name: 'Heineken', src: 'https://www.vectorlogo.zone/logos/heineken/heineken-ar21.svg' },
-    { name: 'Guinness', src: 'https://www.vectorlogo.zone/logos/guinness/guinness-ar21.svg' },
-    { name: 'Mastercard', src: 'https://www.vectorlogo.zone/logos/mastercard/mastercard-ar21.svg' },
-    { name: 'Emirates', src: 'https://www.vectorlogo.zone/logos/emirates/emirates-ar21.svg' },
+    'Companies Sponsoring Rugby',
+    'Companies Sponsoring Rugby',
+    'Companies Sponsoring Rugby',
+    'Companies Sponsoring Rugby',
+    'Companies Sponsoring Rugby',
+    'Companies Sponsoring Rugby',
   ];
 
   const getRegionPanel = (title: string) =>
@@ -947,7 +945,10 @@ export default function App() {
               <div className="mb-4 inline-flex items-center rounded-full border border-[#d6a327]/30 bg-white/6 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.34em] text-[#f1cf75] backdrop-blur-md">
                 Premium Partnership
               </div>
-              <h2 className="max-w-2xl text-4xl font-serif uppercase tracking-[0.06em] text-white sm:text-5xl lg:text-6xl">
+              <h2
+                className="max-w-2xl text-4xl font-serif uppercase tracking-[0.06em] sm:text-5xl lg:text-6xl"
+                style={{ color: '#ffffff', textShadow: '0 4px 18px rgba(0,0,0,0.28)' }}
+              >
                 Sponsor A Club
               </h2>
               <div className="mt-5 h-[3px] w-24 bg-[linear-gradient(90deg,#ef2d2d_0%,#d6a327_100%)]" />
@@ -1073,14 +1074,12 @@ export default function App() {
               <div key={group} className="sponsor-marquee__group">
                 {rugbySponsorLogos.map((logo) => (
                   <div
-                    key={`${group}-${logo.name}`}
+                    key={`${group}-${logo}`}
                     className="flex h-[96px] min-w-[210px] items-center justify-center rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.11),rgba(255,255,255,0.04))] px-8 text-center shadow-[0_12px_28px_rgba(0,0,0,0.22)] backdrop-blur-xl"
                   >
-                    <img
-                      src={logo.src}
-                      alt={logo.name}
-                      className="h-12 w-auto max-w-[150px] object-contain brightness-0 invert"
-                    />
+                    <span className="text-sm font-black uppercase tracking-[0.14em] text-white sm:text-base">
+                      {logo}
+                    </span>
                   </div>
                 ))}
               </div>
