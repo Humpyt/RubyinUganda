@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronDown, Calendar, Menu, CloudSun, Facebook, Info, Send, MessageCircle, Instagram } from 'lucide-react';
+import { ChevronDown, Calendar, Menu, CloudSun, Facebook, Info, Send, MessageCircle, Globe, Phone } from 'lucide-react';
 
 export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openMobileRegion, setOpenMobileRegion] = useState<string | null>(null);
   const [activeSlide, setActiveSlide] = useState(0);
   const [countdown, setCountdown] = useState({ days: '00', hours: '00', minutes: '00', seconds: '00' });
-  const [pollVotes, setPollVotes] = useState({ win: 0, draw: 0, loss: 0 });
-  const [isMatchPollOpen, setIsMatchPollOpen] = useState(false);
-  const [selectedVote, setSelectedVote] = useState<'win' | 'draw' | 'loss' | null>(null);
+  const [pollVotes, setPollVotes] = useState({ rams: 18, draw: 6, eagles: 12 });
+  const [selectedPollOption, setSelectedPollOption] = useState<'rams' | 'draw' | 'eagles' | null>(null);
   const [selectedSponsorClub, setSelectedSponsorClub] = useState('Eagles RFC');
+  const [selectedFixtureIndex, setSelectedFixtureIndex] = useState(0);
+  const [fixtureDeckMode, setFixtureDeckMode] = useState<'fixtures' | 'results' | 'standings'>('fixtures');
+  const [selectedStandingsDivision, setSelectedStandingsDivision] = useState('Premiership');
   const [routeHash, setRouteHash] = useState(() => window.location.hash || '#/');
 
   const tickerItems = [
@@ -89,12 +91,98 @@ export default function App() {
   ];
 
   const sponsorClubOptions = [
-    { name: 'Eagles RFC', mark: 'ER' },
-    { name: 'Kobs RFC', mark: 'KR' },
-    { name: 'Pirates RFC', mark: 'PR' },
-    { name: 'Hippos RFC', mark: 'HR' },
-    { name: 'Walukuba', mark: 'WR' },
+    { name: 'Eagles RFC', mark: 'ER', image: '/slider/one.jpg' },
+    { name: 'Kobs RFC', mark: 'KR', image: '/slider/two.jpeg' },
+    { name: 'Pirates RFC', mark: 'PR', image: '/slider/three.webp' },
+    { name: 'Hippos RFC', mark: 'HR', image: '/slider/one.jpg' },
+    { name: 'Walukuba', mark: 'WR', image: '/slider/two.jpeg' },
   ];
+
+  const playerOfMonthTeams = [
+    { team: 'Eagles RFC', player: 'Ivan Magomu', role: 'Backline Leader', points: '42', highlight: 'Game control', image: '/player.png' },
+    { team: 'Kobs RFC', player: 'Joseph Aredo', role: 'Reliable Kicker', points: '36', highlight: 'Big moments', image: '/slider/one.jpg' },
+    { team: 'Pirates RFC', player: 'Pius Ogena', role: 'Power Carrier', points: '28', highlight: 'Gain line wins', image: '/slider/two.jpeg' },
+    { team: 'Hippos RFC', player: 'Michael Wokorach', role: 'Impact Runner', points: '31', highlight: 'Explosive breaks', image: '/slider/three.webp' },
+  ];
+
+  const fixtureResultCards = [
+    {
+      stage: 'Top 14 - J24',
+      date: '16 May',
+      time: '00h00',
+      home: 'Kobs RFC',
+      away: 'Walukuba',
+      venue: 'Legends Grounds',
+      accent: '#ff4f93',
+      image: '/slider/two.jpeg',
+      status: 'Booking',
+      resultStatus: 'FT',
+      homeScore: 27,
+      awayScore: 18,
+    },
+    {
+      stage: 'Top 14 - J25',
+      date: '30 May',
+      time: '00h00',
+      home: 'Eagles RFC',
+      away: 'Pirates RFC',
+      venue: 'Kings Park',
+      accent: '#ff4f93',
+      image: '/slider/one.jpg',
+      status: 'Booking',
+      resultStatus: 'FT',
+      homeScore: 31,
+      awayScore: 22,
+    },
+    {
+      stage: 'Top 14 - J26',
+      date: '06 Jun',
+      time: '00h00',
+      home: 'Hippos RFC',
+      away: 'Buffaloes',
+      venue: 'Jinja Grounds',
+      accent: '#ff4f93',
+      image: '/slider/three.webp',
+      status: 'Booking',
+      resultStatus: 'FT',
+      homeScore: 19,
+      awayScore: 14,
+    },
+  ];
+
+  const standingsByDivision = {
+    Premiership: [
+      { rank: 1, team: 'Kobs RFC', played: 12, points: 71 },
+      { rank: 2, team: 'Eagles RFC', played: 12, points: 59 },
+      { rank: 3, team: 'Pirates RFC', played: 12, points: 55 },
+      { rank: 4, team: 'Hippos RFC', played: 12, points: 52 },
+      { rank: 5, team: 'Walukuba', played: 12, points: 46 },
+    ],
+    Eastern: [
+      { rank: 1, team: 'Walukuba', played: 10, points: 41 },
+      { rank: 2, team: 'Jinja Hippos II', played: 10, points: 37 },
+      { rank: 3, team: 'Mongers', played: 10, points: 33 },
+      { rank: 4, team: 'Elgon Wolves', played: 10, points: 26 },
+    ],
+    Northern: [
+      { rank: 1, team: 'Gulu City', played: 8, points: 29 },
+      { rank: 2, team: 'Lira Bulls', played: 8, points: 24 },
+      { rank: 3, team: 'Arua Rhinos', played: 8, points: 19 },
+      { rank: 4, team: 'Kitgum Giants', played: 8, points: 12 },
+    ],
+    Western: [
+      { rank: 1, team: 'Buffaloes West', played: 9, points: 35 },
+      { rank: 2, team: 'Mbarara Hawks', played: 9, points: 31 },
+      { rank: 3, team: 'Kasese Select', played: 9, points: 24 },
+      { rank: 4, team: 'Fort Portal', played: 9, points: 16 },
+    ],
+    Central: [
+      { rank: 1, team: 'Ewes', played: 11, points: 44 },
+      { rank: 2, team: 'She Wolves', played: 11, points: 39 },
+      { rank: 3, team: 'Impis', played: 11, points: 34 },
+      { rank: 4, team: 'Thunderbirds', played: 11, points: 22 },
+    ],
+  } as const;
 
   const rugbySponsorLogos = [
     'Companies Sponsoring Rugby',
@@ -172,44 +260,32 @@ export default function App() {
     return () => window.clearInterval(intervalId);
   }, []);
 
-  const totalVotes = pollVotes.win + pollVotes.draw + pollVotes.loss;
+  const totalPollVotes = pollVotes.rams + pollVotes.draw + pollVotes.eagles;
 
-  const handleVote = (option: 'win' | 'draw' | 'loss') => {
-    if (selectedVote === option) {
+  const livePollOptions = [
+    { key: 'rams' as const, label: 'Rams', count: pollVotes.rams },
+    { key: 'draw' as const, label: 'Draw', count: pollVotes.draw },
+    { key: 'eagles' as const, label: 'Eagles', count: pollVotes.eagles },
+  ];
+
+  const handleLivePollVote = (option: 'rams' | 'draw' | 'eagles') => {
+    if (selectedPollOption === option) {
       return;
     }
 
     setPollVotes((current) => {
       const nextVotes = { ...current };
 
-      if (selectedVote) {
-        nextVotes[selectedVote] = Math.max(0, nextVotes[selectedVote] - 1);
+      if (selectedPollOption) {
+        nextVotes[selectedPollOption] = Math.max(0, nextVotes[selectedPollOption] - 1);
       }
 
       nextVotes[option] = nextVotes[option] + 1;
       return nextVotes;
     });
 
-    setSelectedVote(option);
+    setSelectedPollOption(option);
   };
-
-  const voteOptions = [
-    {
-      key: 'win' as const,
-      label: 'Win',
-      count: pollVotes.win,
-    },
-    {
-      key: 'draw' as const,
-      label: 'Draw',
-      count: pollVotes.draw,
-    },
-    {
-      key: 'loss' as const,
-      label: 'Loss',
-      count: pollVotes.loss,
-    },
-  ];
 
   if (activeMerchPage) {
     return (
@@ -262,23 +338,23 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white">
+    <div className="min-h-screen bg-[linear-gradient(180deg,#040507_0%,#09111b_22%,#06080d_55%,#030405_100%)] text-white">
       {/* Top Bar */}
-      <div className="relative z-30 isolate border-t-4 border-b-4 border-[#0f4aa6] bg-black px-2 py-1.5 text-white sm:px-3">
-        <div className="flex w-full items-center gap-2 rounded-full border border-white/10 bg-[#0f1012] px-2 py-1 shadow-[inset_0_0_0_9999px_#0f1012]">
-          <div className="hidden shrink-0 items-center gap-2 rounded-full border border-white/10 bg-[#17191c] px-3 py-1 shadow-[inset_0_0_0_9999px_#17191c] md:flex">
+      <div className="relative z-30 isolate border-t-4 border-b border-[#0f4aa6] bg-[linear-gradient(90deg,#050607_0%,#0a1320_48%,#10140f_100%)] px-2 py-2 text-white sm:px-3">
+        <div className="flex w-full items-center gap-2 rounded-full border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] px-2 py-1.5 shadow-[0_10px_26px_rgba(0,0,0,0.22)] backdrop-blur-xl">
+          <div className="hidden shrink-0 items-center gap-2 rounded-full border border-white/10 bg-black/28 px-3 py-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] md:flex">
             <CloudSun size={16} />
             <div className="flex flex-col leading-none">
               <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/75">Kampala Weather</span>
               <span className="text-sm font-semibold text-white">Overcast 29C / 19C</span>
             </div>
           </div>
-          <div className="ticker-shell flex-1 overflow-hidden rounded-full bg-[#0f1012] shadow-[inset_0_0_0_9999px_#0f1012]">
+          <div className="ticker-shell flex-1 overflow-hidden rounded-full bg-black/18 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
             <div className="ticker-track py-1">
               {[0, 1, 2].map((group) => (
                 <div key={group} className="ticker-group">
                   {tickerItems.map((item, index) => (
-                    <span key={`${group}-${index}-${item}`} className="whitespace-nowrap rounded-full border border-white/10 bg-[#22252a] px-3.5 py-1.5 text-[11.5px] font-semibold text-white/90">
+                    <span key={`${group}-${index}-${item}`} className="whitespace-nowrap rounded-full border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] px-3.5 py-1.5 text-[11.5px] font-semibold text-white/90">
                       {item}
                     </span>
                   ))}
@@ -290,47 +366,47 @@ export default function App() {
       </div>
 
       {/* Header */}
-      <header className="relative z-30 isolate border-b border-white/10 bg-black py-4 px-4 text-white shadow-[inset_0_0_0_9999px_#000] sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-4 bg-black md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center justify-between gap-3 bg-black">
+      <header className="relative z-30 isolate border-b border-white/10 bg-[linear-gradient(180deg,rgba(4,6,9,0.96),rgba(8,12,18,0.92))] px-4 py-4 text-white shadow-[0_18px_40px_rgba(0,0,0,0.22)] backdrop-blur-xl sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center justify-between gap-3">
             <img src="/logo-cutout.png" alt="Rugby in Uganda" className="h-20 w-auto object-contain sm:h-24 lg:h-28" />
             <div className="flex flex-col items-end gap-2">
               <span className="text-xs font-semibold uppercase tracking-[0.2em] text-white/80">
                 Our Partners
               </span>
               <div className="flex flex-wrap items-center justify-end gap-2">
-                <div className="flex h-10 min-w-[74px] items-center justify-center rounded-md border border-white/10 bg-[#0f4aa6] px-3 text-sm font-black italic text-white shadow-sm">
+                <div className="flex h-10 min-w-[74px] items-center justify-center rounded-full border border-white/10 bg-[linear-gradient(180deg,#173e7a_0%,#0f2c59_100%)] px-3 text-sm font-black italic text-white shadow-[0_10px_20px_rgba(15,44,89,0.24)]">
                   macron
                 </div>
-                <div className="flex h-10 min-w-[74px] items-center justify-center rounded-md border border-white/10 bg-[#0f4aa6] px-3 text-xs font-bold text-white shadow-sm">
+                <div className="flex h-10 min-w-[74px] items-center justify-center rounded-full border border-white/10 bg-[linear-gradient(180deg,#173e7a_0%,#0f2c59_100%)] px-3 text-xs font-bold text-white shadow-[0_10px_20px_rgba(15,44,89,0.24)]">
                   HSBC
                 </div>
-                <div className="flex h-10 min-w-[74px] items-center justify-center rounded-md border border-white/10 bg-[#0f4aa6] px-3 text-xs font-bold tracking-wide text-white shadow-sm">
+                <div className="flex h-10 min-w-[74px] items-center justify-center rounded-full border border-white/10 bg-[linear-gradient(180deg,#173e7a_0%,#0f2c59_100%)] px-3 text-xs font-bold tracking-wide text-white shadow-[0_10px_20px_rgba(15,44,89,0.24)]">
                   NILE
                 </div>
               </div>
             </div>
           </div>
           <nav className="hidden md:flex md:justify-end">
-            <div className="flex items-center gap-9 px-2 py-2 text-lg font-semibold text-white">
-              <a href="#" className="flex items-center gap-2 transition-colors hover:text-gray-300">
+            <div className="flex items-center gap-3 rounded-full border border-white/10 bg-black/18 px-3 py-2 text-base font-semibold text-white backdrop-blur-md">
+              <a href="#" className="flex items-center gap-2 rounded-full px-4 py-2 transition-colors hover:bg-white/8 hover:text-white">
                 <span>Latest</span>
                 <ChevronDown size={18} />
               </a>
-              <a href="#" className="flex items-center gap-2 transition-colors hover:text-gray-300">
+              <a href="#" className="flex items-center gap-2 rounded-full px-4 py-2 transition-colors hover:bg-white/8 hover:text-white">
                 <span>Teams</span>
                 <ChevronDown size={18} />
               </a>
-              <a href="#" className="transition-colors hover:text-gray-300">Age Grade</a>
-              <a href="#" className="flex items-center gap-2 transition-colors hover:text-gray-300">
+              <a href="#" className="rounded-full px-4 py-2 transition-colors hover:bg-white/8 hover:text-white">Age Grade</a>
+              <a href="#" className="flex items-center gap-2 rounded-full px-4 py-2 transition-colors hover:bg-white/8 hover:text-white">
                 <span>Tournaments</span>
                 <ChevronDown size={18} />
               </a>
-              <a href="#" className="flex items-center gap-2 transition-colors hover:text-gray-300">
+              <a href="#" className="flex items-center gap-2 rounded-full px-4 py-2 transition-colors hover:bg-white/8 hover:text-white">
                 <span>RIU</span>
                 <ChevronDown size={18} />
               </a>
-              <a href="#" className="flex items-center gap-2 transition-colors hover:text-gray-300">
+              <a href="#" className="flex items-center gap-2 rounded-full bg-[linear-gradient(90deg,#ef2d2d_0%,#ff6d3f_100%)] px-4 py-2 text-white shadow-[0_12px_24px_rgba(239,45,45,0.2)] transition-transform hover:-translate-y-0.5">
                 <span>Fixture & Results</span>
                 <ChevronDown size={18} />
               </a>
@@ -340,7 +416,7 @@ export default function App() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative min-h-[1100px] bg-gray-900 md:min-h-[520px] md:h-[600px]">
+      <section className="relative min-h-[920px] bg-[#071019] md:min-h-[580px] md:h-[680px]">
         {heroSlides.map((slide, index) => (
           <img
             key={slide}
@@ -351,7 +427,7 @@ export default function App() {
               : 'absolute inset-0 h-full w-full scale-125 object-cover object-center opacity-0 transition-opacity duration-700 md:scale-110 md:object-[center_40%]'}
           />
         ))}
-        <div className="absolute inset-0 bg-black/20 md:bg-transparent"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,8,12,0.28)_0%,rgba(4,8,12,0.4)_40%,rgba(3,5,8,0.76)_100%)]"></div>
 
         <div className="absolute top-0 left-0 z-20 w-full overflow-hidden bg-black md:hidden">
           <div className="grid grid-cols-2 bg-black text-white">
@@ -445,11 +521,11 @@ export default function App() {
         </div>
 
         {/* Sub Nav Overlay */}
-        <div className="absolute top-0 left-0 hidden w-full border-b border-white/10 bg-black/30 backdrop-blur-sm md:block">
+        <div className="absolute top-0 left-0 hidden w-full border-b border-white/10 bg-[linear-gradient(180deg,rgba(4,8,12,0.7),rgba(4,8,12,0.38))] backdrop-blur-md md:block">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-6 divide-x divide-white/20 text-center text-white">
               {desktopRegionPanels.map((item) => (
-                <div key={item.title} className="group relative cursor-pointer py-4 transition-colors hover:bg-white/10">
+                <div key={item.title} className="group relative cursor-pointer py-4 transition-colors hover:bg-white/8">
                   <div className="mb-1 text-sm font-bold tracking-widest">{item.title.toUpperCase()}</div>
                   <div className="text-xs tracking-wider text-gray-300">{item.subtitle.toUpperCase()}</div>
                   <div
@@ -480,9 +556,9 @@ export default function App() {
         </div>
 
         {/* Booking Bar */}
-        <div className="absolute right-0 bottom-0 left-0 w-full bg-[#3a4740]/90 py-6 backdrop-blur-md">
+        <div className="absolute inset-x-0 bottom-0 w-full bg-[linear-gradient(90deg,rgba(22,34,27,0.92),rgba(15,29,39,0.92),rgba(33,35,21,0.92))] py-6 backdrop-blur-xl">
           <div className="container mx-auto flex justify-center px-4">
-            <div className="flex w-full items-center gap-3 overflow-x-auto whitespace-nowrap pb-1 md:w-auto md:flex-wrap md:justify-center md:overflow-visible md:whitespace-normal">
+            <div className="flex w-full items-center gap-3 overflow-x-auto whitespace-nowrap rounded-[24px] border border-white/10 bg-black/14 px-3 py-3 pb-1 shadow-[0_18px_40px_rgba(0,0,0,0.2)] md:w-auto md:flex-wrap md:justify-center md:overflow-visible md:whitespace-normal md:pb-3">
               <div className="relative w-[210px] shrink-0 md:w-auto">
                 <select defaultValue="" className="w-full appearance-none border border-white/60 bg-transparent px-4 py-3 text-lg uppercase text-white focus:border-white focus:outline-none md:py-2 md:text-base lg:w-48">
                   <option value="" disabled hidden className="text-black">SHOP</option>
@@ -500,13 +576,25 @@ export default function App() {
                 <ChevronDown size={18} className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 transform text-white/90 md:size-[14px]" />
               </div>
               <div className="relative w-[210px] shrink-0 md:w-auto">
-                <select defaultValue="" className="w-full appearance-none border border-white/60 bg-transparent px-4 py-3 text-lg uppercase text-white focus:border-white focus:outline-none md:py-2 md:text-base lg:w-40">
+                <select
+                  defaultValue=""
+                  onChange={(event) => {
+                    const division = event.target.value;
+                    if (!division) return;
+                    setSelectedStandingsDivision(division);
+                    setFixtureDeckMode('standings');
+                    window.requestAnimationFrame(() => {
+                      document.getElementById('fixtures-results-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    });
+                  }}
+                  className="w-full appearance-none border border-white/60 bg-transparent px-4 py-3 text-lg uppercase text-white focus:border-white focus:outline-none md:py-2 md:text-base lg:w-40"
+                >
                   <option value="" disabled hidden className="text-black">TABLE STANDINGS</option>
-                  <option className="text-black">PREMIERSHIP</option>
-                  <option className="text-black">EASTERN</option>
-                  <option className="text-black">NORTHERN</option>
-                  <option className="text-black">WESTERN</option>
-                  <option className="text-black">CENTRAL</option>
+                  <option className="text-black">Premiership</option>
+                  <option className="text-black">Eastern</option>
+                  <option className="text-black">Northern</option>
+                  <option className="text-black">Western</option>
+                  <option className="text-black">Central</option>
                 </select>
                 <ChevronDown size={18} className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 transform text-white/90 md:size-[14px]" />
               </div>
@@ -531,7 +619,7 @@ export default function App() {
       </section>
 
       {/* Testimonials Section */}
-      <section className={`section-font-fixed relative overflow-hidden py-20 sm:py-28 ${isMatchPollOpen ? 'pb-96 sm:pb-28' : ''}`}>
+      <section className="section-font-fixed relative overflow-visible pt-10 pb-2 sm:pt-12 sm:pb-1">
         <div className="absolute inset-0">
           <img
             src="/slider/two.jpeg"
@@ -541,206 +629,295 @@ export default function App() {
           <div className="absolute inset-0 bg-black/20" />
         </div>
 
-        <div className="relative z-10 mx-auto max-w-5xl px-4" style={{ perspective: '1800px' }}>
+        <div className="relative z-10 mx-auto max-w-[720px] px-3 sm:px-4">
           <div
-            className={`relative transition-transform duration-700 ${
-              isMatchPollOpen
-                ? 'min-h-[1800px] sm:min-h-[980px] lg:min-h-[1120px]'
-                : 'min-h-[860px] sm:min-h-[640px] lg:min-h-[660px]'
-            }`}
-            style={{ transformStyle: 'preserve-3d', transform: isMatchPollOpen ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
+            id="fixtures-results-section"
+            className="mb-6 overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(8,16,23,0.82),rgba(8,14,20,0.88))] shadow-[0_24px_60px_rgba(0,0,0,0.22)] backdrop-blur-xl sm:mb-8"
+            style={{
+              backgroundImage:
+                "linear-gradient(180deg, rgba(7,18,24,0.78), rgba(8,14,20,0.88)), url('/slider/three.webp')",
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
           >
-            <div
-              className={isMatchPollOpen ? 'pointer-events-none absolute inset-0' : 'pointer-events-auto absolute inset-0'}
-              style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}
-            >
-              <div className="bg-[rgba(255,255,255,0.9)] p-5 shadow-[0_24px_60px_rgba(0,0,0,0.18)] sm:p-8">
-                <div
-                  className="relative overflow-hidden rounded-[24px] border border-[#f3a51b]/50 px-5 py-6 sm:px-8 sm:py-8"
-                  style={{
-                    backgroundImage:
-                      "linear-gradient(135deg, rgba(8,8,8,0.84), rgba(28,14,8,0.58)), url('/slider/one.jpg')",
-                    backgroundPosition: 'center',
-                    backgroundSize: 'cover',
-                  }}
-                >
-                  <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" />
-                  <div className="relative z-10">
-                    <div className="mb-5 flex items-start justify-between gap-4">
-                      <div className="inline-flex rounded-md bg-[#f4a71d] px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-black">
-                        Match of the Day
+            <div className="grid grid-cols-1 gap-5 p-4 sm:p-5 lg:p-7">
+              <div className="mx-auto w-full max-w-[560px] pt-4 sm:pt-6">
+                <div className="mb-5 flex justify-center">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/24 px-3 py-2 shadow-[0_12px_24px_rgba(0,0,0,0.14)] backdrop-blur-md">
+                  <a
+                    href="#"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      setFixtureDeckMode('fixtures');
+                    }}
+                    className={`rounded-full px-4 py-2 text-center text-sm font-black uppercase tracking-[0.16em] transition-all sm:px-5 sm:text-base ${
+                      fixtureDeckMode === 'fixtures'
+                        ? 'bg-[#f1cf75] text-[#13253e] shadow-[0_10px_22px_rgba(241,207,117,0.22)]'
+                        : 'text-white hover:text-[#f1cf75]'
+                    }`}
+                  >
+                    Fixtures
+                  </a>
+                  <a
+                    href="#"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      setFixtureDeckMode('results');
+                    }}
+                    className={`rounded-full px-4 py-2 text-center text-sm font-black uppercase tracking-[0.16em] transition-all sm:px-5 sm:text-base ${
+                      fixtureDeckMode === 'results'
+                        ? 'bg-[#ff4f93] text-white shadow-[0_10px_22px_rgba(255,79,147,0.22)]'
+                        : 'text-white hover:text-[#f1cf75]'
+                    }`}
+                  >
+                    Results
+                  </a>
+                  </div>
+                </div>
+                {fixtureDeckMode === 'standings' ? (
+                  <div className="rounded-[18px] border border-white/10 bg-[linear-gradient(180deg,rgba(6,16,27,0.82),rgba(10,20,34,0.68))] p-4 text-white shadow-[0_18px_36px_rgba(0,0,0,0.18)] backdrop-blur-md">
+                    <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-3">
+                      <div>
+                        <div className="text-[11px] font-black uppercase tracking-[0.16em] text-[#f1cf75]">Table Standings</div>
+                        <div className="mt-1 text-xl font-black uppercase tracking-[0.04em] text-white">{selectedStandingsDivision}</div>
                       </div>
-                      <p className="text-xs font-semibold text-white/70 sm:text-sm">Nile Special Rugby</p>
-                    </div>
-
-                    <div className="mb-6 flex flex-col gap-5 text-white lg:flex-row lg:items-center lg:justify-between">
-                      <div className="flex-1 pt-3 text-center lg:pt-8 lg:text-left">
-                        <h2
-                          className="text-3xl font-black uppercase sm:text-4xl"
-                          style={{ color: '#ffffff', textShadow: '0 2px 12px rgba(0,0,0,0.65)' }}
-                        >
-                          Life Guard Rams
-                        </h2>
-                      </div>
-
-                      <div className="text-center">
-                        <div className="text-4xl font-black uppercase text-[#f4a71d] sm:text-5xl">VS</div>
-                        <p className="mt-2 text-sm font-semibold text-white/80">Sun 05/04</p>
-                        <p className="text-lg font-black uppercase text-[#f4a71d]">4:00PM</p>
-                        <p className="mt-4 text-sm font-bold uppercase tracking-[0.22em] text-white/65">Kitante</p>
-                      </div>
-
-                      <div className="flex-1 pt-3 text-center lg:pt-8 lg:text-right">
-                        <h2
-                          className="text-3xl font-black uppercase sm:text-4xl"
-                          style={{ color: '#ffffff', textShadow: '0 2px 12px rgba(0,0,0,0.65)' }}
-                        >
-                          Eagles
-                        </h2>
+                      <div className="rounded-full border border-white/10 bg-white/8 px-3 py-2 text-[10px] font-black uppercase tracking-[0.16em] text-white/76">
+                        Live Table
                       </div>
                     </div>
 
-                    <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                      {[
-                        { value: countdown.days, label: 'Days' },
-                        { value: countdown.hours, label: 'Hrs' },
-                        { value: countdown.minutes, label: 'Min' },
-                        { value: countdown.seconds, label: 'Sec' },
-                      ].map((item) => (
+                    <div className="mt-4 space-y-3">
+                      {standingsByDivision[selectedStandingsDivision as keyof typeof standingsByDivision].map((row) => (
                         <div
-                          key={item.label}
-                          className="rounded-xl border border-[#f3a51b]/50 bg-black/55 px-4 py-4 text-center shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]"
+                          key={`${selectedStandingsDivision}-${row.rank}-${row.team}`}
+                          className="grid grid-cols-[40px_1fr_auto_auto] items-center gap-3 rounded-[14px] border border-white/10 bg-white px-3 py-3 text-[#17304b] shadow-[0_10px_22px_rgba(0,0,0,0.12)]"
                         >
-                          <div className="text-3xl font-black text-[#f4a71d]">{item.value}</div>
-                          <div className="mt-2 text-xs font-bold uppercase tracking-[0.18em] text-white/65">{item.label}</div>
+                          <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[linear-gradient(180deg,#17304b_0%,#0f1f34_100%)] text-sm font-black text-white">
+                            {row.rank}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="truncate text-sm font-black uppercase tracking-[0.04em]">{row.team}</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-[10px] font-black uppercase tracking-[0.12em] text-[#5d6b7b]">P</div>
+                            <div className="mt-1 text-sm font-black">{row.played}</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-[10px] font-black uppercase tracking-[0.12em] text-[#5d6b7b]">Pts</div>
+                            <div className="mt-1 text-sm font-black">{row.points}</div>
+                          </div>
                         </div>
                       ))}
                     </div>
+                  </div>
+                ) : (
+                  <div className="relative h-[372px] w-full lg:h-[430px]">
+                  {fixtureResultCards.map((match, index) => {
+                    const offset = (index - selectedFixtureIndex + fixtureResultCards.length) % fixtureResultCards.length;
+                    const position =
+                      offset === 0 ? 'center' : offset === 1 ? 'right' : 'left';
 
-                    <button
-                      type="button"
-                      onClick={() => setIsMatchPollOpen(true)}
-                      className="inline-flex w-full items-center justify-center rounded-xl bg-[#f4a71d] px-6 py-4 text-sm font-black uppercase tracking-[0.14em] text-black transition-colors hover:bg-[#ffb938]"
+                    const cardClass =
+                      position === 'center'
+                        ? 'left-1/2 top-0 z-30 w-[276px] -translate-x-1/2 lg:w-[360px]'
+                        : position === 'left'
+                          ? 'left-[4px] top-[16px] z-10 w-[170px] lg:left-[28px] lg:top-[20px] lg:w-[220px]'
+                          : 'right-[4px] top-[16px] z-10 w-[170px] lg:right-[28px] lg:top-[20px] lg:w-[220px]';
+
+                    return (
+                      <button
+                        key={`stacked-fixture-${match.home}-${match.away}`}
+                        type="button"
+                        onClick={() => setSelectedFixtureIndex(index)}
+                        className={`absolute h-[280px] overflow-hidden rounded-[14px] border border-white/90 bg-[linear-gradient(180deg,#ffffff_0%,#f8f9fc_100%)] text-center text-[#17304b] shadow-[0_18px_36px_rgba(0,0,0,0.18)] transition-all duration-300 ${cardClass} lg:h-[332px]`}
+                      >
+                        {position === 'center' ? (
+                          <div className="px-6 py-7 lg:px-8 lg:py-9">
+                            <div className="flex items-center justify-between gap-3 text-[11px] font-bold uppercase tracking-[0.08em] lg:text-xs">
+                              <span className="rounded-full bg-[#17304b]/6 px-3 py-1 text-[#17304b]">{match.stage}</span>
+                              <span className="text-[#17304b]">
+                                {fixtureDeckMode === 'fixtures' ? `${match.date} ${match.time}` : match.resultStatus}
+                              </span>
+                            </div>
+                            <div className="mt-5 lg:mt-7">
+                              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border-4 border-[#ffe1ef] bg-[linear-gradient(135deg,#ffeff7,#ffffff)] text-lg font-black uppercase text-[#ff4f93] shadow-[0_10px_24px_rgba(255,79,147,0.12)] lg:h-20 lg:w-20 lg:text-xl">
+                                {match.home.split(' ')[0].slice(0, 2)}
+                              </div>
+                            </div>
+                            <div className="mt-5 text-[17px] font-black uppercase leading-tight tracking-[0.04em] lg:text-[21px]">{match.home}</div>
+                            {fixtureDeckMode === 'fixtures' ? (
+                              <div className="mt-3 text-[42px] font-black uppercase leading-none text-[#ff4f93] lg:text-[52px]">VS</div>
+                            ) : (
+                              <div className="mt-3 text-[34px] font-black uppercase leading-none text-[#ff4f93] lg:text-[42px]">
+                                {match.homeScore} - {match.awayScore}
+                              </div>
+                            )}
+                            <div className="mt-3 text-[17px] font-black uppercase leading-tight tracking-[0.04em] lg:text-[21px]">{match.away}</div>
+                            <div className="mt-5 lg:mt-6">
+                              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border-4 border-[#e7efff] bg-[linear-gradient(135deg,#eef4ff,#ffffff)] text-sm font-black uppercase text-[#17304b] lg:h-14 lg:w-14">
+                                {match.away.split(' ')[0].slice(0, 2)}
+                              </div>
+                            </div>
+                            <div className="mt-5 rounded-[12px] border border-[#17304b]/10 bg-[linear-gradient(180deg,rgba(23,48,75,0.05),rgba(23,48,75,0.02))] px-4 py-3 text-[11px] font-bold uppercase tracking-[0.12em] text-[#5d6b7b] lg:mt-6">
+                              Venue: {match.venue}
+                            </div>
+                            <div className={`mt-5 inline-flex rounded-[10px] px-6 py-3 text-sm font-black text-white lg:mt-7 lg:px-7 lg:py-3.5 ${
+                              fixtureDeckMode === 'fixtures'
+                                ? 'bg-[linear-gradient(180deg,#17304b_0%,#12243c_100%)] shadow-[0_10px_22px_rgba(18,36,60,0.18)]'
+                                : 'bg-[linear-gradient(180deg,#ff4f93_0%,#ff2e7d_100%)] shadow-[0_10px_22px_rgba(255,79,147,0.22)]'
+                            }`}>
+                              {fixtureDeckMode === 'fixtures' ? match.status : match.resultStatus}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex h-full flex-col justify-between bg-[linear-gradient(180deg,rgba(255,255,255,1),rgba(245,247,251,0.96))] px-4 py-6 text-[#b6b0a8] lg:px-5 lg:py-7">
+                            <div className="text-xs font-medium uppercase leading-tight lg:text-[13px]">
+                              {match.stage}
+                            </div>
+                            <div className="text-sm font-semibold lg:text-base">
+                              {fixtureDeckMode === 'fixtures' ? match.date : `${match.homeScore}-${match.awayScore}`}
+                            </div>
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+                )}
+              </div>
+
+            </div>
+          </div>
+
+          <div className="bg-[rgba(255,255,255,0.9)] p-2 shadow-[0_24px_60px_rgba(0,0,0,0.18)] sm:p-3">
+            <div
+              className="relative overflow-hidden rounded-[24px] border border-[#f3a51b]/50 px-5 py-6 sm:px-8 sm:py-8"
+              style={{
+                backgroundImage:
+                  "linear-gradient(135deg, rgba(8,8,8,0.84), rgba(28,14,8,0.58)), url('/slider/one.jpg')",
+                backgroundPosition: 'center',
+                backgroundSize: 'cover',
+              }}
+            >
+              <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" />
+              <div className="relative z-10">
+                <div className="mb-10 flex items-start justify-between gap-4">
+                  <div className="inline-flex rounded-md bg-[#f4a71d] px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-black">
+                    Match of the Day
+                  </div>
+                  <p className="text-xs font-semibold text-white/70 sm:text-sm">Nile Special Rugby</p>
+                </div>
+
+                <div className="mb-6 flex flex-col gap-4 text-white lg:flex-row lg:items-center lg:justify-between">
+                  <div className="flex items-center justify-between gap-3 sm:gap-5 lg:flex-1 lg:pt-8">
+                    <h2
+                      className="min-w-0 flex-1 text-left text-[20px] font-black uppercase leading-none sm:text-4xl"
+                      style={{ color: '#ffffff', textShadow: '0 2px 12px rgba(0,0,0,0.65)' }}
                     >
-                      Match Poll
-                    </button>
+                      Life Guard Rams
+                    </h2>
+
+                    <div className="shrink-0 text-center">
+                      <div className="text-[24px] font-black uppercase text-[#f4a71d] sm:text-5xl">VS</div>
+                      <p className="mt-1 text-[11px] font-semibold text-white/80 sm:mt-2 sm:text-sm">Sun 05/04</p>
+                      <p className="text-[16px] font-black uppercase text-[#f4a71d] sm:text-lg">4:00PM</p>
+                      <p className="mt-2 text-[11px] font-bold uppercase tracking-[0.18em] text-white/65 sm:mt-4 sm:text-sm sm:tracking-[0.22em]">Kitante</p>
+                    </div>
+
+                    <h2
+                      className="min-w-0 flex-1 text-right text-[20px] font-black uppercase leading-none sm:text-4xl"
+                      style={{ color: '#ffffff', textShadow: '0 2px 12px rgba(0,0,0,0.65)' }}
+                    >
+                      Eagles
+                    </h2>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <div
-              className={isMatchPollOpen ? 'pointer-events-auto absolute inset-0' : 'pointer-events-none absolute inset-0'}
-              style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
-            >
-              <div className="bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(247,242,230,0.92))] p-4 shadow-[0_24px_60px_rgba(0,0,0,0.18)] sm:p-5 lg:p-6">
-                <div className="overflow-hidden rounded-[24px] border border-[#161616] bg-[linear-gradient(180deg,#f7f1e6_0%,#efe7d8_100%)] text-black shadow-[0_24px_50px_rgba(0,0,0,0.28)] sm:rounded-[28px]">
-                  <div className="border-b border-black/10 bg-[linear-gradient(90deg,rgba(255,255,255,0.55),rgba(255,255,255,0.18))] px-4 py-4 sm:px-5 sm:py-4 lg:px-6 lg:py-5">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                        <div className="text-[11px] font-black uppercase tracking-[0.22em] text-black/55">Interactive Vote</div>
-                        <h2 className="mt-1 text-lg font-black uppercase tracking-[0.16em] sm:mt-2 sm:text-2xl lg:text-3xl">Match Poll</h2>
-                        <p className="mt-1 max-w-xl text-[12px] leading-relaxed text-black/62 sm:mt-2 sm:text-base lg:text-lg">
-                          Cast your pick for the result and watch the live percentages update instantly.
-                        </p>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {[
+                    { value: countdown.days, label: 'Days' },
+                    { value: countdown.hours, label: 'Hrs' },
+                    { value: countdown.minutes, label: 'Min' },
+                    { value: countdown.seconds, label: 'Sec' },
+                  ].map((item) => (
+                    <div
+                      key={item.label}
+                      className="rounded-xl border border-[#f3a51b]/50 bg-black/55 px-4 py-4 text-center shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]"
+                    >
+                      <div className="text-3xl font-black text-[#f4a71d]">{item.value}</div>
+                      <div className="mt-2 text-xs font-bold uppercase tracking-[0.18em] text-white/65">{item.label}</div>
                     </div>
-                      <div className="grid grid-cols-2 gap-2 sm:min-w-[260px] sm:gap-3">
-                        <div className="rounded-xl border border-black/10 bg-white/55 px-3 py-2 text-center sm:rounded-2xl sm:px-3 sm:py-2.5 lg:px-4 lg:py-3">
-                          <div className="text-[11px] font-black uppercase tracking-[0.18em] text-black/48">Total Votes</div>
-                          <div className="mt-1 text-xl font-black sm:mt-1 sm:text-2xl lg:mt-2 lg:text-3xl">{totalVotes}</div>
-                        </div>
-                        <div className="rounded-xl border border-black/10 bg-white/55 px-3 py-2 text-center sm:rounded-2xl sm:px-3 sm:py-2.5 lg:px-4 lg:py-3">
-                          <div className="text-[11px] font-black uppercase tracking-[0.18em] text-black/48">Active Polls</div>
-                          <div className="mt-1 text-xl font-black sm:mt-1 sm:text-2xl lg:mt-2 lg:text-3xl">1</div>
-                        </div>
-                      </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(0,0,0,0.42),rgba(0,0,0,0.28))] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-md sm:mt-6 sm:p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[#f4a71d]">Live Poll</div>
+                      <p className="mt-1 text-xs font-semibold uppercase tracking-[0.08em] text-white/80 sm:text-sm">
+                        Who takes this one?
+                      </p>
+                    </div>
+                    <div className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white/70">
+                      {totalPollVotes} Votes
                     </div>
                   </div>
 
-                  <div className="p-4 sm:p-5 lg:p-7">
-                    <div className="mb-4 rounded-[18px] border border-black/12 bg-[linear-gradient(135deg,#f4a71d_0%,#ffbf43_100%)] px-4 py-4 text-center shadow-[inset_0_-3px_0_rgba(0,0,0,0.12),0_16px_24px_rgba(244,167,29,0.22)] sm:mb-5 sm:rounded-[22px] sm:px-5 sm:py-5 lg:mb-6 lg:rounded-[24px] lg:px-6 lg:py-6">
-                      <div className="text-[11px] font-black uppercase tracking-[0.18em] text-black/65 sm:text-[11px] sm:tracking-[0.28em]">Match Date</div>
-                      <div className="mt-1 text-3xl font-black uppercase sm:mt-2 sm:text-4xl lg:text-5xl">Sun 05/04</div>
-                    </div>
+                  <div className="mt-3 grid grid-cols-3 gap-2">
+                    {livePollOptions.map((option) => {
+                      const isSelected = selectedPollOption === option.key;
+                      const percentage = totalPollVotes === 0 ? 0 : Math.round((option.count / totalPollVotes) * 100);
 
-                    <div className="mb-4 flex flex-col gap-2 border-b border-black/10 pb-4 sm:mb-5 sm:gap-3 sm:pb-5 sm:flex-row sm:items-end sm:justify-between">
-                      <div>
-                        <div className="text-[11px] font-black uppercase tracking-[0.14em] text-black/45 sm:text-[11px] sm:tracking-[0.24em]">Prediction Prompt</div>
-                        <p className="mt-1 text-xl font-black uppercase sm:mt-2 sm:text-3xl lg:text-4xl">Life Guard Rams To Win</p>
-                      </div>
-                      <div className="rounded-full border border-black/10 bg-white/55 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.08em] text-black/65 sm:px-4 sm:py-2 sm:text-sm sm:tracking-[0.16em]">
-                        Live Community Pick
-                      </div>
-                    </div>
-
-                    <div className="mb-4 grid grid-cols-1 gap-2 sm:mb-5 sm:grid-cols-3 sm:gap-2.5 lg:mb-6 lg:gap-3">
-                      {voteOptions.map((option) => (
+                      return (
                         <button
                           key={option.key}
                           type="button"
-                          onClick={() => handleVote(option.key)}
-                          className={`rounded-lg border px-3 py-2 text-[12px] font-black uppercase tracking-[0.03em] transition-all duration-200 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-base sm:tracking-[0.06em] lg:px-6 lg:py-4 lg:text-lg lg:tracking-[0.08em] ${
-                            selectedVote === option.key
-                              ? option.key === 'win'
-                                ? 'border-black bg-black text-white shadow-[0_12px_24px_rgba(0,0,0,0.18)]'
-                                : option.key === 'draw'
-                                  ? 'border-[#b87800] bg-[linear-gradient(135deg,#f4a71d_0%,#ffbf43_100%)] text-black shadow-[0_12px_24px_rgba(244,167,29,0.24)]'
-                                  : 'border-black bg-white text-black shadow-[0_12px_24px_rgba(0,0,0,0.12)]'
-                              : option.key === 'draw'
-                                ? 'border-[#c78b14] bg-[#f8d07f]/65 text-black hover:-translate-y-0.5 hover:bg-[#f4a71d]'
-                                : option.key === 'win'
-                                  ? 'border-black/80 bg-[#111] text-white hover:-translate-y-0.5'
-                                  : 'border-black/20 bg-white/75 text-black hover:-translate-y-0.5 hover:bg-white'
+                          onClick={() => handleLivePollVote(option.key)}
+                          className={`rounded-[14px] border px-2 py-2 text-center transition-all duration-200 sm:px-3 sm:py-3 ${
+                            isSelected
+                              ? 'border-[#f4a71d] bg-[linear-gradient(180deg,rgba(244,167,29,0.22),rgba(244,167,29,0.12))] shadow-[0_10px_24px_rgba(244,167,29,0.14)]'
+                              : 'border-white/12 bg-white/6 hover:border-white/20 hover:bg-white/10'
                           }`}
                         >
-                          <div>{option.label}</div>
-                          <div className={`mt-0.5 text-[9px] font-bold uppercase tracking-[0.06em] sm:text-[11px] sm:tracking-[0.14em] lg:text-xs lg:tracking-[0.18em] ${
-                            selectedVote === option.key ? 'opacity-80' : 'opacity-55'
-                          }`}>
-                            {selectedVote === option.key ? 'Selected' : 'Tap To Vote'}
+                          <div className={`text-[11px] font-black uppercase tracking-[0.1em] sm:text-xs ${isSelected ? 'text-[#f8c35a]' : 'text-white'}`}>
+                            {option.label}
+                          </div>
+                          <div className={`mt-1 text-[18px] font-black sm:text-[22px] ${isSelected ? 'text-[#f8c35a]' : 'text-white'}`}>
+                            {percentage}%
+                          </div>
+                          <div className="mt-1 text-[9px] font-bold uppercase tracking-[0.14em] text-white/55">
+                            {option.count} picks
                           </div>
                         </button>
-                      ))}
-                    </div>
+                      );
+                    })}
+                  </div>
 
-                    <p className="mb-4 rounded-md border border-black/8 bg-white/45 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.05em] text-black/62 sm:mb-5 sm:rounded-2xl sm:px-4 sm:py-2.5 sm:text-sm sm:tracking-[0.12em] lg:px-4 lg:py-3 lg:text-base lg:tracking-[0.16em]">
-                      {selectedVote ? 'Your vote is active. Tap another option to change it.' : 'Tap one option to cast your vote.'}
-                    </p>
+                  <div className="mt-3 space-y-2">
+                    {livePollOptions.map((option) => {
+                      const percentage = totalPollVotes === 0 ? 0 : Math.round((option.count / totalPollVotes) * 100);
 
-                    <div className="space-y-2 sm:space-y-3 lg:space-y-4">
-                      {voteOptions.map((option) => {
-                        const percentage = totalVotes === 0 ? 0 : Math.round((option.count / totalVotes) * 100);
-                        const barClass =
-                          option.key === 'win'
-                            ? 'bg-[#111]'
-                            : option.key === 'draw'
-                              ? 'bg-[linear-gradient(90deg,#f4a71d_0%,#ffbf43_100%)]'
-                              : 'bg-white';
-
-                        return (
-                          <div key={`result-${option.key}`} className="rounded-[12px] border border-black/10 bg-white/45 px-3 py-2 sm:rounded-[20px] sm:px-4 sm:py-3 lg:rounded-[22px] lg:px-5 lg:py-4">
-                            <div className="mb-1.5 flex items-center justify-between gap-2 sm:mb-2">
-                              <span className="text-[12px] font-black uppercase sm:text-lg lg:text-xl">{option.label}</span>
-                              <span className="text-[10px] font-black sm:text-base lg:text-lg">{percentage}% | {option.count}</span>
-                            </div>
-                            <div className="h-1 overflow-hidden rounded-full border border-black/12 bg-white/80 sm:h-3 lg:h-4">
-                              <div
-                                className={`h-full transition-all duration-300 ${barClass}`}
-                                style={{ width: `${percentage}%` }}
-                              />
-                            </div>
+                      return (
+                        <div key={`poll-bar-${option.key}`}>
+                          <div className="mb-1 flex items-center justify-between text-[10px] font-black uppercase tracking-[0.12em] text-white/72">
+                            <span>{option.label}</span>
+                            <span>{percentage}%</span>
                           </div>
-                        );
-                      })}
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => setIsMatchPollOpen(false)}
-                      className="mt-3 inline-flex w-full items-center justify-center rounded-md bg-[#111] px-4 py-2 text-[9px] font-black uppercase tracking-[0.08em] text-white transition-colors hover:bg-[#222] sm:mt-5 sm:rounded-2xl sm:py-3 sm:text-sm sm:tracking-[0.14em] lg:mt-6 lg:py-4 lg:text-base lg:tracking-[0.18em]"
-                    >
-                      Back To Match
-                    </button>
+                          <div className="h-2 overflow-hidden rounded-full border border-white/10 bg-white/8">
+                            <div
+                              className={`h-full transition-all duration-300 ${
+                                option.key === 'draw'
+                                  ? 'bg-[linear-gradient(90deg,#ffe08a_0%,#f4a71d_100%)]'
+                                  : option.key === 'rams'
+                                    ? 'bg-[linear-gradient(90deg,#ffffff_0%,#d8d8d8_100%)]'
+                                    : 'bg-[linear-gradient(90deg,#0f4aa6_0%,#5f95ff_100%)]'
+                              }`}
+                              style={{ width: `${percentage}%` }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -750,125 +927,103 @@ export default function App() {
       </section>
 
       {/* Activities Section */}
-      <section className="relative overflow-hidden bg-[#050505] py-18 sm:py-24">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(214,163,39,0.14),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(15,74,166,0.18),transparent_28%)]" />
-        <div className="absolute inset-x-0 top-0 h-40 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),transparent)]" />
+      <section className="relative mt-8 overflow-hidden bg-[#050505] pt-14 pb-18 sm:mt-10 sm:pt-18 sm:pb-24">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(214,163,39,0.16),transparent_22%),radial-gradient(circle_at_bottom_right,rgba(15,74,166,0.22),transparent_28%),linear-gradient(180deg,#040404_0%,#090909_100%)]" />
+        <div className="absolute inset-x-0 top-0 h-40 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),transparent)]" />
+        <div className="absolute left-[-8%] top-24 h-64 w-64 rounded-full bg-[#d6a327]/8 blur-3xl" />
+        <div className="absolute right-[-6%] top-36 h-72 w-72 rounded-full bg-[#0f4aa6]/10 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="mx-auto max-w-4xl text-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#d6a327]/20 bg-white/6 px-5 py-2.5 text-xs font-black uppercase tracking-[0.22em] text-[#f1cf75] backdrop-blur-md">
+          <div className="mx-auto max-w-5xl rounded-[34px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))] px-5 py-8 text-center shadow-[0_30px_80px_rgba(0,0,0,0.32)] backdrop-blur-xl sm:px-8 sm:py-12">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#d6a327]/25 bg-[#d6a327]/8 px-5 py-2.5 text-xs font-black uppercase tracking-[0.22em] text-[#f1cf75] backdrop-blur-md">
               Premium Advertising
             </div>
-            <p className="mt-5 font-serif text-xl italic text-[#f1cf75] sm:text-2xl">Put Your Brand Where Rugby Culture Lives</p>
-            <h2
-              className="mx-auto mt-4 max-w-5xl font-serif text-4xl tracking-[0.03em] text-[#fff7e6] sm:text-6xl"
-              style={{ textShadow: '0 6px 18px rgba(0,0,0,0.45)' }}
-            >
-              Advertise With A Format That Makes Your Logo Look Established
-            </h2>
-            <p className="mx-auto mt-6 max-w-4xl text-lg leading-relaxed text-white/92 sm:text-xl">
-              This space is designed for serious sponsors. Your business can appear across premium logo placements, branded features, matchday visibility, and long-term partner storytelling around Rugby In Uganda.
+            <p className="mx-auto mt-5 max-w-2xl font-serif text-[16px] italic leading-snug text-[#f1cf75] sm:text-2xl">
+              Put Your Brand Where Rugby Culture Lives
+            </p>
+            <p className="mx-auto mt-5 max-w-2xl text-[15px] leading-relaxed text-white/84 sm:text-xl">
+              Serious brands can show up here through logo placement, branded features, matchday visibility, and long-term storytelling across Rugby In Uganda.
             </p>
           </div>
 
-          <div className="mt-12 grid gap-5 md:grid-cols-3">
-            <div className="rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] px-6 py-6 shadow-[0_18px_40px_rgba(0,0,0,0.24)] backdrop-blur-md">
-              <div className="text-xs font-black uppercase tracking-[0.2em] text-white/45">Monthly Reach</div>
+          <div className="mt-10 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 md:grid md:grid-cols-3 md:overflow-visible md:pb-0">
+            <div className="min-w-[85%] snap-center rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.03))] px-6 py-6 shadow-[0_18px_40px_rgba(0,0,0,0.24)] backdrop-blur-md md:min-w-0">
+              <div className="mb-4 h-1 w-16 rounded-full bg-[linear-gradient(90deg,#d6a327_0%,#efbf45_100%)]" />
+              <div className="text-[11px] font-black uppercase tracking-[0.22em] text-white/45">Monthly Reach</div>
               <div className="mt-3 text-5xl font-black text-white">50K+</div>
-              <div className="mt-3 text-lg leading-relaxed text-white/82">Across fixtures, results, polls, feature stories, and partner mentions.</div>
+              <div className="mt-3 text-base leading-relaxed text-white/78 sm:text-lg">Across fixtures, results, polls, feature stories, and partner mentions.</div>
             </div>
-            <div className="rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] px-6 py-6 shadow-[0_18px_40px_rgba(0,0,0,0.24)] backdrop-blur-md">
-              <div className="text-xs font-black uppercase tracking-[0.2em] text-white/45">Audience Fit</div>
+            <div className="min-w-[85%] snap-center rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.03))] px-6 py-6 shadow-[0_18px_40px_rgba(0,0,0,0.24)] backdrop-blur-md md:min-w-0">
+              <div className="mb-4 h-1 w-16 rounded-full bg-[linear-gradient(90deg,#0f4aa6_0%,#4f8cff_100%)]" />
+              <div className="text-[11px] font-black uppercase tracking-[0.22em] text-white/45">Audience Fit</div>
               <div className="mt-3 text-5xl font-black text-white">Fans, Clubs</div>
-              <div className="mt-3 text-lg leading-relaxed text-white/82">A community built around sport, events, schools, and loyal supporter networks.</div>
+              <div className="mt-3 text-base leading-relaxed text-white/78 sm:text-lg">A community built around sport, events, schools, and loyal supporter networks.</div>
             </div>
-            <div className="rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] px-6 py-6 shadow-[0_18px_40px_rgba(0,0,0,0.24)] backdrop-blur-md">
-              <div className="text-xs font-black uppercase tracking-[0.2em] text-white/45">Brand Value</div>
+            <div className="min-w-[85%] snap-center rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.03))] px-6 py-6 shadow-[0_18px_40px_rgba(0,0,0,0.24)] backdrop-blur-md md:min-w-0">
+              <div className="mb-4 h-1 w-16 rounded-full bg-[linear-gradient(90deg,#ef2d2d_0%,#ff9b45_100%)]" />
+              <div className="text-[11px] font-black uppercase tracking-[0.22em] text-white/45">Brand Value</div>
               <div className="mt-3 text-5xl font-black text-white">Worldwide</div>
-              <div className="mt-3 text-lg leading-relaxed text-white/82">A polished presentation that makes local and global sponsors look at home.</div>
+              <div className="mt-3 text-base leading-relaxed text-white/78 sm:text-lg">A polished presentation that makes local and global sponsors look at home.</div>
             </div>
           </div>
 
           <div className="mt-12 grid gap-6 lg:grid-cols-4">
-            <div className="group relative overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,#121418_0%,#0a0b0d_100%)] p-6 shadow-[0_24px_50px_rgba(0,0,0,0.3)] transition-transform duration-300 hover:-translate-y-1">
-              <div className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#d6a327_0%,#ef2d2d_100%)]" />
+            <div className="group relative overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,#121418_0%,#0a0b0d_100%)] p-6 shadow-[0_24px_50px_rgba(0,0,0,0.3)] lg:col-span-2">
+              <div className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#d6a327_0%,#ef2d2d_52%,#0f4aa6_100%)]" />
               <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.03))] p-5">
-                <div className="text-xs font-black uppercase tracking-[0.18em] text-white/55">Logo Preview Area</div>
-                <div className="mt-4 flex h-36 items-center justify-center rounded-[18px] border border-dashed border-white/16 bg-black/25 px-4 text-center text-2xl font-black uppercase tracking-[0.16em] text-white/92">
-                  Your Logo Here
-                </div>
-                <div className="mt-4 grid grid-cols-2 gap-2 text-xs font-bold uppercase tracking-[0.12em] text-white/70">
-                  <div className="rounded-full border border-white/10 px-3 py-2.5 text-center">Homepage</div>
-                  <div className="rounded-full border border-white/10 px-3 py-2.5 text-center">Hero Slots</div>
-                </div>
-              </div>
-              <div className="mt-6 text-xs font-black uppercase tracking-[0.24em] text-[#f1cf75]">Premium Placement</div>
-              <h3 className="mt-3 font-serif text-3xl leading-tight text-white">Homepage Banner Presence</h3>
-              <p className="mt-4 text-lg leading-relaxed text-white/82">
-                Best for brands that want immediate visual authority with logo-led exposure in high-traffic positions.
-              </p>
-            </div>
+                <div className="text-xs font-black uppercase tracking-[0.18em] text-white/55">Kampanis Shoes and Bags Clinic</div>
 
-            <div className="group relative overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,#121418_0%,#0a0b0d_100%)] p-6 shadow-[0_24px_50px_rgba(0,0,0,0.3)] transition-transform duration-300 hover:-translate-y-1">
-              <div className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#0f4aa6_0%,#d6a327_100%)]" />
-              <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.03))] p-5">
-                <div className="text-xs font-black uppercase tracking-[0.18em] text-white/55">Editorial Style</div>
-                <div className="mt-4 rounded-[18px] border border-white/10 bg-[linear-gradient(135deg,rgba(15,74,166,0.22),rgba(255,255,255,0.04))] px-4 py-6 text-left">
-                  <div className="text-sm font-black uppercase tracking-[0.18em] text-white/65">Presented By</div>
-                  <div className="mt-3 text-2xl font-black uppercase tracking-[0.08em] text-white">Your Brand Story</div>
-                  <div className="mt-2 text-lg leading-relaxed text-white/82">Campaigns, interviews, and feature-led visibility.</div>
+                <div className="mt-4 overflow-hidden rounded-[20px] border border-dashed border-white/16 bg-[linear-gradient(135deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))] p-2">
+                  <div className="group/logo relative flex h-[176px] items-center justify-center overflow-hidden rounded-[18px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] px-5 text-center">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(214,163,39,0.18),transparent_42%),radial-gradient(circle_at_bottom_right,rgba(15,74,166,0.18),transparent_40%)]" />
+                    <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[16px] border border-white/30 bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]">
+                      <div className="flex h-full w-full items-center justify-center p-4 sm:p-5">
+                        <img
+                          src="/advertiseres/kampanis.jpeg"
+                          alt="Kampanis Shoes and Bags Clinic logo"
+                          className="max-h-full max-w-full object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.28)]"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className="mt-6 text-xs font-black uppercase tracking-[0.24em] text-[#f1cf75]">Brand Storytelling</div>
-              <h3 className="mt-3 font-serif text-3xl leading-tight text-white">Sponsored Features That Feel Premium</h3>
-              <p className="mt-4 text-lg leading-relaxed text-white/82">
-                Ideal for companies that want more than impressions and need a story-rich presence people remember.
-              </p>
-            </div>
 
-            <div className="group relative overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,#121418_0%,#0a0b0d_100%)] p-6 shadow-[0_24px_50px_rgba(0,0,0,0.3)] transition-transform duration-300 hover:-translate-y-1">
-              <div className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#ef2d2d_0%,#ff9b45_100%)]" />
-              <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.03))] p-5">
-                <div className="text-xs font-black uppercase tracking-[0.18em] text-white/55">Matchday Visibility</div>
-                <div className="mt-4 grid gap-2">
-                  <div className="rounded-[16px] border border-white/10 bg-white/5 px-4 py-4 text-base font-black uppercase tracking-[0.14em] text-white/92">Logo In Fixtures</div>
-                  <div className="rounded-[16px] border border-white/10 bg-white/5 px-4 py-4 text-base font-black uppercase tracking-[0.14em] text-white/92">Poll Sponsorship</div>
-                  <div className="rounded-[16px] border border-white/10 bg-white/5 px-4 py-4 text-base font-black uppercase tracking-[0.14em] text-white/92">Top Match Coverage</div>
+                <div className="mt-4 flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 text-[10px] font-bold uppercase tracking-[0.08em] text-white/70 sm:grid sm:grid-cols-3 sm:overflow-visible sm:pb-0 sm:text-xs sm:tracking-[0.12em]">
+                  <a
+                    href="#"
+                    className="inline-flex min-w-[120px] snap-start items-center justify-center gap-1 rounded-full border border-white/10 px-2 py-2.5 text-center transition-colors hover:border-white/20 hover:bg-white/6 sm:w-full sm:min-w-0 sm:gap-2 sm:px-3"
+                  >
+                    <Globe size={14} />
+                    <span>Web</span>
+                  </a>
+                  <a
+                    href="tel:+256000000000"
+                    className="inline-flex min-w-[120px] snap-start items-center justify-center gap-1 rounded-full border border-white/10 px-2 py-2.5 text-center transition-colors hover:border-white/20 hover:bg-white/6 sm:w-full sm:min-w-0 sm:gap-2 sm:px-3"
+                  >
+                    <Phone size={14} />
+                    <span>Call</span>
+                  </a>
+                  <a
+                    href="https://wa.me/256000000000"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex min-w-[140px] snap-start items-center justify-center gap-1 rounded-full bg-[linear-gradient(90deg,#d6a327_0%,#efbf45_100%)] px-2 py-2.5 text-center text-black shadow-[0_14px_24px_rgba(214,163,39,0.22)] transition-transform hover:-translate-y-0.5 sm:w-full sm:min-w-0 sm:gap-2 sm:px-4"
+                  >
+                    <MessageCircle size={14} />
+                    WhatsApp
+                  </a>
                 </div>
               </div>
-              <div className="mt-6 text-xs font-black uppercase tracking-[0.24em] text-[#f1cf75]">Matchday Exposure</div>
-              <h3 className="mt-3 font-serif text-3xl leading-tight text-white">Be Seen Where Attention Peaks</h3>
-              <p className="mt-4 text-lg leading-relaxed text-white/82">
-                Great for companies that want their logo next to fixtures, predictions, big games, and fan activity.
-              </p>
-            </div>
-
-            <div className="group relative overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,#121418_0%,#0a0b0d_100%)] p-6 shadow-[0_24px_50px_rgba(0,0,0,0.3)] transition-transform duration-300 hover:-translate-y-1">
-              <div className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#d6a327_0%,#0f4aa6_100%)]" />
-              <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.03))] p-5">
-                <div className="text-xs font-black uppercase tracking-[0.18em] text-white/55">Corporate Fit</div>
-                <div className="mt-4 flex h-36 items-center justify-center rounded-[18px] border border-white/10 bg-[linear-gradient(135deg,rgba(214,163,39,0.16),rgba(15,74,166,0.12))] px-5 text-center">
-                  <div className="text-xl font-black uppercase tracking-[0.14em] text-white">Built For Serious Partners</div>
-                </div>
-              </div>
-              <div className="mt-6 text-xs font-black uppercase tracking-[0.24em] text-[#f1cf75]">Business Growth</div>
-              <h3 className="mt-3 font-serif text-3xl leading-tight text-white">A Better-Looking Home For Sponsors</h3>
-              <p className="mt-4 text-lg leading-relaxed text-white/82">
-                A sharper, more professional environment that helps businesses picture their brand here with confidence.
-              </p>
             </div>
           </div>
 
           <div className="mt-12 flex flex-col items-center justify-center gap-4 text-center">
             <a
               href="#"
-              className="inline-flex items-center justify-center rounded-full bg-[linear-gradient(90deg,#d6a327_0%,#efbf45_100%)] px-12 py-5 text-base font-black uppercase tracking-[0.22em] text-black shadow-[0_20px_36px_rgba(214,163,39,0.24)] transition-transform hover:-translate-y-0.5"
+              className="inline-flex items-center justify-center rounded-full bg-[linear-gradient(90deg,#d6a327_0%,#efbf45_100%)] px-4 py-2.5 text-xs font-black uppercase tracking-[0.12em] text-black shadow-[0_14px_24px_rgba(214,163,39,0.22)] transition-transform hover:-translate-y-0.5"
             >
               Advertise With Us
             </a>
-            <div className="text-xs font-bold uppercase tracking-[0.22em] text-white/42">
-              Premium presentation for logo-driven partnerships
-            </div>
           </div>
         </div>
       </section>
@@ -893,17 +1048,17 @@ export default function App() {
             </div>
           </div>
 
-          <div className="grid max-w-[78rem] grid-cols-1 gap-6 md:grid-cols-[0.98fr_1.22fr_0.98fr] md:items-stretch lg:gap-8">
-            <div className="group relative flex min-h-[430px] flex-col overflow-hidden rounded-[32px] border border-white/15 bg-[radial-gradient(circle_at_top,#2b2b32_0%,#0d0d10_72%)] p-5 shadow-[0_24px_60px_rgba(0,0,0,0.22)] sm:min-h-[540px] sm:p-6">
+          <div className="flex snap-x snap-mandatory gap-6 overflow-x-auto pb-2 md:grid md:max-w-[78rem] md:grid-cols-[0.98fr_1.22fr_0.98fr] md:items-stretch md:overflow-visible md:pb-0 lg:gap-8">
+            <div className="group relative flex min-h-[500px] min-w-[72%] snap-center flex-col overflow-hidden rounded-[32px] border border-white/15 bg-[radial-gradient(circle_at_top,#2b2b32_0%,#0d0d10_72%)] p-3 shadow-[0_24px_60px_rgba(0,0,0,0.22)] sm:min-h-[540px] sm:min-w-0 sm:p-6">
               <div className="absolute left-4 top-4 z-20 rounded-full border border-white/12 bg-white/8 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-white/80 backdrop-blur-md">
                 Black Edition
               </div>
               <div className="absolute inset-x-0 bottom-0 h-32 bg-[linear-gradient(180deg,transparent_0%,rgba(11,45,100,0.22)_100%)]" />
-              <div className="relative mt-10 flex flex-1 items-center justify-center sm:mt-12">
+              <div className="relative mt-4 flex flex-1 items-center justify-center sm:mt-12">
                 <img
                   src="/shop/black.jpeg"
                   alt="Black Rugby In Uganda merchandise"
-                  className="h-full max-h-[380px] w-full object-contain object-center transition-transform duration-700 group-hover:scale-[1.04] sm:max-h-[500px]"
+                  className="h-full max-h-[500px] w-full object-contain object-center transition-transform duration-700 group-hover:scale-[1.04]"
                 />
               </div>
               <div className="relative z-10 mt-5 flex items-end justify-between text-white">
@@ -917,7 +1072,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className="relative flex min-h-[520px] flex-col overflow-hidden rounded-[34px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,250,244,0.95)_0%,rgba(243,236,224,0.92)_100%)] px-6 py-10 text-center shadow-[0_24px_60px_rgba(0,0,0,0.12)] sm:min-h-[680px] sm:px-10 sm:py-12">
+            <div className="relative flex min-h-[520px] min-w-[92%] snap-center flex-col overflow-hidden rounded-[34px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,250,244,0.95)_0%,rgba(243,236,224,0.92)_100%)] px-6 py-10 text-center shadow-[0_24px_60px_rgba(0,0,0,0.12)] sm:min-h-[680px] sm:min-w-0 sm:px-10 sm:py-12">
               <div className="absolute inset-x-0 top-0 h-1.5 bg-[linear-gradient(90deg,#0b2d64_0%,#ef2d2d_54%,#d6a327_100%)]" />
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(11,45,100,0.08),transparent_48%)]" />
               <div className="absolute right-6 top-6 hidden h-24 w-24 rounded-full border border-[#0b2d64]/8 bg-white/40 md:block" />
@@ -966,16 +1121,16 @@ export default function App() {
               </div>
             </div>
 
-            <div className="group relative flex min-h-[430px] flex-col overflow-hidden rounded-[32px] border border-white/15 bg-[radial-gradient(circle_at_top,#26272c_0%,#08080b_74%)] p-5 shadow-[0_24px_60px_rgba(0,0,0,0.22)] sm:min-h-[540px] sm:p-6">
+            <div className="group relative flex min-h-[500px] min-w-[72%] snap-center flex-col overflow-hidden rounded-[32px] border border-white/15 bg-[radial-gradient(circle_at_top,#26272c_0%,#08080b_74%)] p-3 shadow-[0_24px_60px_rgba(0,0,0,0.22)] sm:min-h-[540px] sm:min-w-0 sm:p-6">
               <div className="absolute left-4 top-4 z-20 rounded-full border border-white/12 bg-white/8 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-white/80 backdrop-blur-md">
                 White Edition
               </div>
               <div className="absolute inset-x-0 bottom-0 h-32 bg-[linear-gradient(180deg,transparent_0%,rgba(239,45,45,0.2)_100%)]" />
-              <div className="relative mt-10 flex flex-1 items-center justify-center sm:mt-12">
+              <div className="relative mt-4 flex flex-1 items-center justify-center sm:mt-12">
                 <img
                   src="/shop/white.jpeg"
                   alt="White Rugby In Uganda merchandise"
-                  className="h-full max-h-[380px] w-full object-contain object-center transition-transform duration-700 group-hover:scale-[1.04] sm:max-h-[500px]"
+                  className="h-full max-h-[500px] w-full object-contain object-center transition-transform duration-700 group-hover:scale-[1.04]"
                 />
               </div>
               <div className="relative z-10 mt-5 flex items-end justify-between text-white">
@@ -993,7 +1148,7 @@ export default function App() {
       </section>
 
       {/* Sponsor A Club Section */}
-      <section className="relative overflow-hidden bg-[#080a0f] px-4 py-16 text-white sm:px-6 sm:py-24">
+      <section className="relative overflow-hidden bg-[#080a0f] px-4 pt-16 pb-6 text-white sm:px-6 sm:pt-24 sm:pb-8">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-45"
           style={{ backgroundImage: "url('/slider/three.webp')" }}
@@ -1006,81 +1161,19 @@ export default function App() {
         </div>
 
         <div className="relative mx-auto max-w-7xl">
-          <div className="mb-12 grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
-            <div className="max-w-3xl">
-              <div className="mb-4 inline-flex items-center rounded-full border border-[#d6a327]/30 bg-white/6 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.34em] text-[#f1cf75] backdrop-blur-md">
-                Premium Partnership
-              </div>
-              <h2
-                className="max-w-2xl text-4xl font-serif uppercase tracking-[0.06em] sm:text-5xl lg:text-6xl"
-                style={{ color: '#ffffff', textShadow: '0 4px 18px rgba(0,0,0,0.28)' }}
-              >
-                Sponsor A Club
-              </h2>
-              <div className="mt-5 h-[3px] w-24 bg-[linear-gradient(90deg,#ef2d2d_0%,#d6a327_100%)]" />
-              <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/78 sm:text-lg">
-                Align your brand with ambition, youth development, and matchday culture through a premium club partnership built for visibility and real community impact.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <div className="rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.11),rgba(255,255,255,0.04))] px-5 py-5 shadow-[0_18px_45px_rgba(0,0,0,0.18)] backdrop-blur-xl">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/48">Community Reach</div>
-                <div className="mt-3 text-3xl font-black text-white">Clubs</div>
-              </div>
-              <div className="rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.11),rgba(255,255,255,0.04))] px-5 py-5 shadow-[0_18px_45px_rgba(0,0,0,0.18)] backdrop-blur-xl">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/48">Impact</div>
-                <div className="mt-3 text-3xl font-black text-white">Youth</div>
-              </div>
-              <div className="rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.11),rgba(255,255,255,0.04))] px-5 py-5 shadow-[0_18px_45px_rgba(0,0,0,0.18)] backdrop-blur-xl">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/48">Visibility</div>
-                <div className="mt-3 text-3xl font-black text-white">Nationwide</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mb-8 overflow-hidden rounded-[32px] border border-white/12 bg-[linear-gradient(135deg,rgba(7,9,14,0.92),rgba(18,22,32,0.78))] shadow-[0_30px_80px_rgba(0,0,0,0.36)] backdrop-blur-2xl">
-            <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr]">
-              <div className="relative px-6 py-8 sm:px-8 sm:py-10">
-                <div className="absolute inset-y-0 left-0 w-1 bg-[linear-gradient(180deg,#d6a327_0%,#ef2d2d_100%)]" />
-                <div className="pl-3">
-                  <div className="text-xs font-semibold uppercase tracking-[0.3em] text-[#f1cf75]">Featured Club</div>
-                  <div className="mt-3 max-w-2xl text-4xl font-black uppercase tracking-[0.05em] text-white sm:text-5xl">
-                    {selectedSponsorClub}
-                  </div>
-                  <p className="mt-5 max-w-2xl text-sm leading-relaxed text-white/72 sm:text-base">
-                    Back player welfare, school outreach, travel, equipment, and a stronger matchday experience while placing your brand in front of fans, families, and the wider rugby community.
-                  </p>
-                  <div className="mt-7 grid gap-3 sm:grid-cols-3">
-                    <div className="rounded-[18px] border border-white/10 bg-white/6 px-4 py-4">
-                      <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/42">Audience</div>
-                      <div className="mt-2 text-lg font-black uppercase text-white">Fans & Families</div>
-                    </div>
-                    <div className="rounded-[18px] border border-white/10 bg-white/6 px-4 py-4">
-                      <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/42">Value</div>
-                      <div className="mt-2 text-lg font-black uppercase text-white">Brand Lift</div>
-                    </div>
-                    <div className="rounded-[18px] border border-white/10 bg-white/6 px-4 py-4">
-                      <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/42">Purpose</div>
-                      <div className="mt-2 text-lg font-black uppercase text-white">Community Impact</div>
-                    </div>
-                  </div>
+          <div className="mb-10 overflow-hidden rounded-[34px] border border-white/10 bg-[linear-gradient(135deg,rgba(8,12,19,0.95),rgba(12,18,28,0.86))] shadow-[0_30px_80px_rgba(0,0,0,0.36)] backdrop-blur-2xl">
+            <div className="absolute inset-x-0 top-0 h-1.5 bg-[linear-gradient(90deg,#0b2d64_0%,#ef2d2d_52%,#d6a327_100%)]" />
+            <div className="relative flex justify-center px-6 py-8 text-center sm:px-8 sm:py-10">
+              <div className="max-w-3xl">
+                <div className="mb-5 inline-flex items-center rounded-full border border-[#d6a327]/30 bg-[#d6a327]/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.32em] text-[#f1cf75]">
+                  Matchday Partnership
                 </div>
-              </div>
-              <div className="flex flex-col justify-between border-t border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] px-6 py-7 lg:border-l lg:border-t-0">
-                <div>
-                  <div className="text-xs font-semibold uppercase tracking-[0.28em] text-white/45">Sponsorship Access</div>
-                  <div className="mt-3 text-3xl font-black uppercase tracking-[0.06em] text-white">Premium Placement</div>
-                  <p className="mt-4 text-sm leading-relaxed text-white/68">
-                    Secure a cleaner, stronger brand presence around one club with a direct path into local rugby culture.
-                  </p>
-                </div>
-                <a
-                  href="#"
-                  className="mt-8 inline-flex items-center justify-center rounded-full bg-[linear-gradient(90deg,#ef2d2d_0%,#ff4a3f_100%)] px-8 py-4 text-sm font-black uppercase tracking-[0.2em] text-white shadow-[0_18px_40px_rgba(239,45,45,0.28)] transition-transform hover:-translate-y-0.5"
-                >
-                  Sponsor {selectedSponsorClub}
-                </a>
+                <h2 className="text-4xl font-black uppercase tracking-[0.04em] text-white sm:text-5xl lg:text-6xl">
+                  Sponsor A Club
+                </h2>
+                <p className="mt-5 text-base leading-relaxed text-white/76 sm:text-lg">
+                  Step into the heartbeat of Ugandan rugby with a sport-first brand placement built around players, fans, fixtures, and club culture.
+                </p>
               </div>
             </div>
           </div>
@@ -1091,31 +1184,27 @@ export default function App() {
                 key={club.name}
                 type="button"
                 onClick={() => setSelectedSponsorClub(club.name)}
-                className={`relative flex min-h-[220px] min-w-[230px] snap-center flex-col items-center justify-center overflow-hidden rounded-[26px] border px-5 py-6 text-center shadow-[0_20px_44px_rgba(0,0,0,0.24)] transition-all duration-300 hover:-translate-y-1 ${
+                className={`group relative flex min-h-[456px] min-w-[360px] snap-center flex-col justify-between overflow-hidden rounded-[18px] border text-left shadow-[0_20px_44px_rgba(0,0,0,0.24)] transition-all duration-300 hover:-translate-y-1 ${
                   selectedSponsorClub === club.name
-                    ? 'border-[#ef2d2d]/80 bg-[linear-gradient(180deg,#fff8ef_0%,#ffffff_100%)] text-black ring-2 ring-[#ef2d2d]/55'
-                    : 'border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.11),rgba(255,255,255,0.05))] text-white backdrop-blur-xl'
+                    ? 'border-[#ef2d2d]/85 ring-2 ring-[#ef2d2d]/55'
+                    : 'border-white/10'
                 }`}
               >
-                <div className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#0b2d64_0%,#ef2d2d_55%,#d6a327_100%)]" />
-                <span className={`absolute top-3 right-3 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] ${
-                  selectedSponsorClub === club.name
-                    ? 'bg-[#ef2d2d] text-white'
-                    : 'bg-white/10 text-white/85'
-                }`}>
-                  {selectedSponsorClub === club.name ? 'Selected' : 'Select Club'}
-                </span>
-                <div className={`flex h-20 w-20 items-center justify-center rounded-full border text-2xl font-black uppercase tracking-[0.08em] shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] ${
-                  selectedSponsorClub === club.name
-                    ? 'border-[#d6a327]/50 bg-[#f7f1e5] text-[#0b2d64]'
-                    : 'border-[#d6a327]/35 bg-white/6 text-white'
-                }`}>
-                  {club.mark}
-                </div>
-                <div className={`mt-5 text-lg font-black uppercase tracking-[0.08em] ${
-                  selectedSponsorClub === club.name ? 'text-[#111]' : 'text-white'
-                }`}>
-                  {club.name}
+                <img
+                  src={club.image}
+                  alt={club.name}
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                />
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,10,16,0.08)_0%,rgba(8,10,16,0.18)_40%,rgba(6,7,10,0.62)_100%)]" />
+                <div className="absolute inset-x-0 bottom-0 h-44 bg-[linear-gradient(180deg,transparent_0%,rgba(0,0,0,0.42)_100%)]" />
+                <div className="relative z-10 min-h-[72px]" />
+                <div className="relative z-10 p-6">
+                  <div className="flex items-center justify-between rounded-[10px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.24),rgba(255,255,255,0.16))] px-5 py-4 text-white backdrop-blur-sm">
+                    <div className="text-[16px] font-black uppercase leading-tight tracking-[0.08em]">
+                      {`SPONSOR ${club.name.replace(' RFC', '').toUpperCase()}`}
+                    </div>
+                    <span className="text-3xl leading-none">→</span>
+                  </div>
                 </div>
               </button>
             ))}
@@ -1127,6 +1216,197 @@ export default function App() {
               className="inline-flex w-full items-center justify-center rounded-full border border-white/12 bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05))] px-6 py-4 text-center text-sm font-black uppercase tracking-[0.18em] text-white backdrop-blur-xl transition-colors hover:bg-white/14 sm:w-auto sm:px-8"
             >
               Explore Club Sponsorship
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Player Of The Month Section */}
+      <section className="relative overflow-hidden bg-[#0b0e14] px-4 pt-6 pb-16 text-white sm:px-6 sm:pt-8 sm:pb-24">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(214,163,39,0.12),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(15,74,166,0.16),transparent_32%),linear-gradient(180deg,#090c12_0%,#0e1219_100%)]" />
+        <div className="absolute left-[-6%] top-16 h-56 w-56 rounded-full bg-[#ef2d2d]/10 blur-3xl" />
+        <div className="absolute right-[-4%] bottom-10 h-64 w-64 rounded-full bg-[#0f4aa6]/14 blur-3xl" />
+
+        <div className="relative mx-auto max-w-7xl">
+          <div className="mb-8 text-center sm:mb-10">
+            <div className="inline-flex items-center rounded-full border border-[#d6a327]/25 bg-[#d6a327]/8 px-4 py-2 text-[11px] font-black uppercase tracking-[0.28em] text-[#f1cf75]">
+              Monthly Spotlight
+            </div>
+            <h2 className="mt-5 text-4xl font-black uppercase tracking-[0.04em] text-white sm:text-5xl lg:text-6xl">
+              Player Of The Month
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-white/72 sm:text-lg">
+              Each club can spotlight its own standout performer. Here are this month&apos;s featured players across different teams.
+            </p>
+          </div>
+
+          <div className="hidden gap-6 lg:grid lg:grid-cols-2 xl:grid-cols-4">
+            {playerOfMonthTeams.map((item) => (
+              <article
+                key={item.team}
+                className="overflow-hidden rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.03))] shadow-[0_24px_60px_rgba(0,0,0,0.24)] backdrop-blur-xl"
+              >
+                <div className="relative h-[280px] overflow-hidden border-b border-white/10">
+                  <img src={item.image} alt={item.player} className="h-full w-full object-cover object-top" />
+                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,10,16,0.05)_0%,rgba(8,10,16,0.15)_55%,rgba(6,7,10,0.45)_100%)]" />
+                  <div className="absolute left-4 top-4 rounded-full border border-white/16 bg-black/18 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-white/88 backdrop-blur-md">
+                    {item.team}
+                  </div>
+                </div>
+                <div className="p-5">
+                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[#f1cf75]">{item.role}</div>
+                  <h3 className="mt-2 text-[28px] font-black uppercase leading-[0.96] tracking-[0.03em] text-white">
+                    {item.player}
+                  </h3>
+                  <div className="mt-4 flex items-center gap-3">
+                    <div className="rounded-[16px] border border-white/10 bg-black/18 px-4 py-3">
+                      <div className="text-[9px] font-black uppercase tracking-[0.16em] text-white/42">Points</div>
+                      <div className="mt-1 text-xl font-black text-white">{item.points}</div>
+                    </div>
+                    <div className="min-w-0 flex-1 rounded-[16px] border border-white/10 bg-black/18 px-4 py-3">
+                      <div className="text-[9px] font-black uppercase tracking-[0.16em] text-white/42">Highlight</div>
+                      <div className="mt-1 text-sm font-black uppercase tracking-[0.04em] text-white">{item.highlight}</div>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <div className="mt-6 -mx-4 overflow-x-auto px-4 pb-2 lg:hidden [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex snap-x snap-mandatory gap-4">
+            {playerOfMonthTeams.map((item) => (
+              <article
+                key={`mobile-${item.team}`}
+                className="w-[252px] shrink-0 snap-center overflow-hidden rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.03))] shadow-[0_24px_60px_rgba(0,0,0,0.24)] backdrop-blur-xl"
+              >
+                <div className="relative h-[280px] overflow-hidden border-b border-white/10">
+                  <img src={item.image} alt={item.player} className="h-full w-full object-cover object-top" />
+                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,10,16,0.05)_0%,rgba(8,10,16,0.15)_55%,rgba(6,7,10,0.45)_100%)]" />
+                  <div className="absolute left-4 top-4 rounded-full border border-white/16 bg-black/18 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-white/88 backdrop-blur-md">
+                    {item.team}
+                  </div>
+                </div>
+                <div className="p-5">
+                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[#f1cf75]">{item.role}</div>
+                  <h3 className="mt-2 text-[28px] font-black uppercase leading-[0.96] tracking-[0.03em] text-white">
+                    {item.player}
+                  </h3>
+                  <div className="mt-4 flex items-center gap-3">
+                    <div className="rounded-[16px] border border-white/10 bg-black/18 px-4 py-3">
+                      <div className="text-[9px] font-black uppercase tracking-[0.16em] text-white/42">Points</div>
+                      <div className="mt-1 text-xl font-black text-white">{item.points}</div>
+                    </div>
+                    <div className="min-w-0 flex-1 rounded-[16px] border border-white/10 bg-black/18 px-4 py-3">
+                      <div className="text-[9px] font-black uppercase tracking-[0.16em] text-white/42">Highlight</div>
+                      <div className="mt-1 text-sm font-black uppercase tracking-[0.04em] text-white">{item.highlight}</div>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            ))}
+            </div>
+          </div>
+
+          <div className="hidden">
+            <div className="relative overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] shadow-[0_24px_60px_rgba(0,0,0,0.28)]">
+              <div className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#0b2d64_0%,#ef2d2d_55%,#d6a327_100%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_42%)]" />
+              <div className="relative px-5 py-5 sm:px-6 sm:py-6">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="rounded-full border border-white/12 bg-white/8 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-white/82 backdrop-blur-md">
+                    April 2026
+                  </div>
+                  <div className="rounded-full bg-[#ef2d2d] px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-white">
+                    Selected
+                  </div>
+                </div>
+
+                <div className="mt-5 overflow-hidden rounded-[24px] border border-white/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02))]">
+                  <img
+                    src="/player.png"
+                    alt="Player of the month"
+                    className="h-[360px] w-full object-cover object-top sm:h-[460px]"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col justify-between rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] px-5 py-6 shadow-[0_24px_60px_rgba(0,0,0,0.24)] backdrop-blur-xl sm:px-7 sm:py-8">
+              <div>
+                <div className="text-[11px] font-black uppercase tracking-[0.24em] text-[#f1cf75]">Backline Leader</div>
+                <h3 className="mt-3 text-4xl font-black uppercase tracking-[0.04em] text-white sm:text-5xl">
+                  Ivan Magomu
+                </h3>
+                <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/74 sm:text-lg">
+                  A composed playmaker with a huge boot, relentless match tempo, and the ability to turn pressure into points. This month’s performances stood out for leadership, precision, and consistency.
+                </p>
+
+                <div className="mt-7 grid grid-cols-3 gap-3">
+                  <div className="rounded-[20px] border border-white/10 bg-black/16 px-4 py-4 text-center">
+                    <div className="text-[10px] font-black uppercase tracking-[0.18em] text-white/42">Points</div>
+                    <div className="mt-2 text-2xl font-black text-white">42</div>
+                  </div>
+                  <div className="rounded-[20px] border border-white/10 bg-black/16 px-4 py-4 text-center">
+                    <div className="text-[10px] font-black uppercase tracking-[0.18em] text-white/42">Tries</div>
+                    <div className="mt-2 text-2xl font-black text-white">4</div>
+                  </div>
+                  <div className="rounded-[20px] border border-white/10 bg-black/16 px-4 py-4 text-center">
+                    <div className="text-[10px] font-black uppercase tracking-[0.18em] text-white/42">MOTM</div>
+                    <div className="mt-2 text-2xl font-black text-white">2</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <a
+                  href="#"
+                  className="inline-flex items-center justify-center rounded-full bg-[linear-gradient(90deg,#ef2d2d_0%,#ff4a3f_100%)] px-8 py-4 text-sm font-black uppercase tracking-[0.18em] text-white shadow-[0_18px_40px_rgba(239,45,45,0.28)] transition-transform hover:-translate-y-0.5"
+                >
+                  View Full Story
+                </a>
+                <a
+                  href="#"
+                  className="inline-flex items-center justify-center rounded-full border border-white/12 bg-white/6 px-8 py-4 text-sm font-black uppercase tracking-[0.18em] text-white backdrop-blur-xl transition-colors hover:bg-white/12"
+                >
+                  More Player Awards
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div className="hidden">
+            <div className="overflow-hidden rounded-[22px] border border-white/10">
+              <img
+                src="/player.png"
+                alt="Player of the month"
+                className="h-[280px] w-full object-cover object-top"
+              />
+            </div>
+            <div className="mt-4 text-[10px] font-black uppercase tracking-[0.22em] text-[#f1cf75]">Player Of The Month</div>
+            <h3 className="mt-2 text-3xl font-black uppercase tracking-[0.04em] text-white">Ivan Magomu</h3>
+            <p className="mt-3 text-sm leading-relaxed text-white/74">
+              A composed playmaker whose game control, kicking accuracy, and leadership stood out all month.
+            </p>
+            <div className="mt-4 grid grid-cols-3 gap-2">
+              <div className="rounded-[16px] border border-white/10 bg-black/16 px-3 py-3 text-center">
+                <div className="text-[9px] font-black uppercase tracking-[0.16em] text-white/42">Points</div>
+                <div className="mt-1 text-lg font-black text-white">42</div>
+              </div>
+              <div className="rounded-[16px] border border-white/10 bg-black/16 px-3 py-3 text-center">
+                <div className="text-[9px] font-black uppercase tracking-[0.16em] text-white/42">Tries</div>
+                <div className="mt-1 text-lg font-black text-white">4</div>
+              </div>
+              <div className="rounded-[16px] border border-white/10 bg-black/16 px-3 py-3 text-center">
+                <div className="text-[9px] font-black uppercase tracking-[0.16em] text-white/42">MOTM</div>
+                <div className="mt-1 text-lg font-black text-white">2</div>
+              </div>
+            </div>
+            <a
+              href="#"
+              className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[linear-gradient(90deg,#ef2d2d_0%,#ff4a3f_100%)] px-6 py-4 text-sm font-black uppercase tracking-[0.18em] text-white shadow-[0_18px_40px_rgba(239,45,45,0.28)] transition-transform hover:-translate-y-0.5"
+            >
+              View Full Story
             </a>
           </div>
         </div>
