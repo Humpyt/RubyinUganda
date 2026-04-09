@@ -1,9 +1,12 @@
-import { useEffect, useRef } from 'react';
-import { Facebook, Instagram, Twitter, ExternalLink, ArrowLeft } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Facebook, Instagram, Twitter, ExternalLink, ArrowLeft, CloudSun, Menu } from 'lucide-react';
 import DesktopTopNav from './DesktopTopNav';
+import MobileTopNav from './MobileTopNav';
 import SharedFooter from './SharedFooter';
 import type { RegionalClub } from './regionalClubs';
 import { buildClubRoute } from './regionalClubs';
+import { buildLeagueRoute, leagueMenuLinks } from './leaguePages';
+import { buildFixtureResultsRoute, fixtureResultsMenuLinks } from './fixtureResultsPages';
 
 interface ClubProfilePageProps {
   club: RegionalClub;
@@ -11,7 +14,7 @@ interface ClubProfilePageProps {
 }
 
 const profileTabs = [
-  { key: 'news', label: 'News & Video' },
+  { key: 'news', label: 'Shop' },
   { key: 'fixtures-results', label: 'Fixtures & Results' },
   { key: 'standings', label: 'Standings' },
   { key: 'squad', label: 'Squad' },
@@ -20,6 +23,7 @@ const profileTabs = [
 ] as const;
 
 export default function ClubProfilePage({ club, activeTab }: ClubProfilePageProps) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const currentTab = profileTabs.find((tab) => tab.key === activeTab) ?? profileTabs[0];
   const contentSectionRef = useRef<HTMLElement | null>(null);
   const buildRegionRoute = (regionTitle: string, link: string) =>
@@ -49,14 +53,19 @@ export default function ClubProfilePage({ club, activeTab }: ClubProfilePageProp
       ],
     },
     {
-      label: 'Tournaments',
-      href: buildRegionRoute(club.region, 'Fixtures'),
+      label: 'Leagues',
+      href:
+        club.region === 'Central'
+          ? buildLeagueRoute('central', 'men')
+          : club.region === 'Eastern'
+            ? buildLeagueRoute('eastern', 'men')
+            : club.region === 'Northern'
+              ? buildLeagueRoute('northern', 'men')
+              : club.region === 'Western'
+                ? buildLeagueRoute('western', 'men')
+                : buildLeagueRoute('premiership', 'men'),
       featured: false,
-      links: [
-        { label: `${club.region} Fixtures`, href: buildRegionRoute(club.region, 'Fixtures') },
-        { label: `${club.region} Standings`, href: buildRegionRoute(club.region, 'Standings') },
-        { label: 'Schools Cup', href: buildRegionRoute('Schools', 'Schools Cup') },
-      ],
+      links: leagueMenuLinks,
     },
     {
       label: 'RIU',
@@ -70,13 +79,18 @@ export default function ClubProfilePage({ club, activeTab }: ClubProfilePageProp
     },
     {
       label: 'Fixture & Results',
-      href: buildRegionRoute(club.region, 'Fixtures'),
+      href:
+        club.region === 'Central'
+          ? buildFixtureResultsRoute('central', 'men')
+          : club.region === 'Eastern'
+            ? buildFixtureResultsRoute('eastern', 'men')
+            : club.region === 'Northern'
+              ? buildFixtureResultsRoute('northern', 'men')
+              : club.region === 'Western'
+                ? buildFixtureResultsRoute('western', 'men')
+                : buildFixtureResultsRoute('premiership', 'men'),
       featured: true,
-      links: [
-        { label: `${club.name} Fixtures`, href: buildClubRoute(club.region, club.slug, 'fixtures-results') },
-        { label: `${club.region} Fixtures`, href: buildRegionRoute(club.region, 'Fixtures') },
-        { label: `${club.region} Standings`, href: buildRegionRoute(club.region, 'Standings') },
-      ],
+      links: fixtureResultsMenuLinks,
     },
   ] as const;
 
@@ -125,9 +139,40 @@ export default function ClubProfilePage({ club, activeTab }: ClubProfilePageProp
               </div>
             </div>
           </div>
-          <DesktopTopNav menus={topMenuPanels} standaloneLink={{ label: 'Age Grade', href: buildRegionRoute('Schools', 'Boys') }} />
+          <div className="hidden md:block">
+            <DesktopTopNav menus={topMenuPanels} standaloneLink={{ label: 'Age Grade', href: buildRegionRoute('Schools', 'Boys') }} />
+          </div>
         </div>
       </header>
+
+      <section className="relative z-[90] border-b border-white/10 bg-black md:hidden">
+        <div className="grid grid-cols-2 bg-black text-white">
+          <div className="flex items-center justify-center gap-3 border-r border-white px-3 py-4">
+            <CloudSun size={20} />
+            <div className="text-left leading-tight">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/75">Kampala Weather</div>
+              <div className="text-sm font-semibold">Overcast 29C / 19C</div>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsMobileMenuOpen((value) => !value)}
+            className="flex items-center justify-center gap-3 py-4 text-xl font-semibold"
+          >
+            <Menu size={22} />
+            <span className="text-2xl">Menu</span>
+          </button>
+        </div>
+        {isMobileMenuOpen ? (
+          <div className="border-t border-white/10 bg-black px-4 py-4">
+            <MobileTopNav
+              menus={topMenuPanels}
+              standaloneLink={{ label: 'Age Grade', href: buildRegionRoute('Schools', 'Boys') }}
+              onNavigate={() => setIsMobileMenuOpen(false)}
+            />
+          </div>
+        ) : null}
+      </section>
 
       <section className="relative overflow-hidden bg-[#173c8f] text-white">
         <div className="absolute inset-0 opacity-15">

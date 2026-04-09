@@ -8,6 +8,10 @@ import ClubProfilePage from './ClubProfilePage';
 import MobileTopNav from './MobileTopNav';
 import SharedFooter from './SharedFooter';
 import { findRegionalClub } from './regionalClubs';
+import LeagueSubPage from './LeagueSubPage';
+import { buildLeagueRoute, getLeaguePage, leagueMenuLinks } from './leaguePages';
+import FixtureResultsSubPage from './FixtureResultsSubPage';
+import { buildFixtureResultsRoute, fixtureResultsMenuLinks, getFixtureResultsPage } from './fixtureResultsPages';
 
 export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -96,7 +100,7 @@ export default function App() {
     { label: 'Latest', hasDropdown: true },
     { label: 'Teams', hasDropdown: true },
     { label: 'Age Grade', hasDropdown: false },
-    { label: 'Tournaments', hasDropdown: true },
+    { label: 'Leagues', hasDropdown: true },
     { label: 'RIU', hasDropdown: true },
     { label: 'Fixture & Results', hasDropdown: true },
   ];
@@ -456,9 +460,9 @@ export default function App() {
     Latest: '#/',
     Teams: buildRegionRoute('Central', 'Men'),
     'Age Grade': buildRegionRoute('Schools', 'Boys'),
-    Tournaments: buildRegionRoute('Central', 'Fixtures'),
+    Leagues: buildLeagueRoute('premiership', 'men'),
     RIU: '#/shop/matchday-wear',
-    'Fixture & Results': buildRegionRoute('Central', 'Fixtures'),
+    'Fixture & Results': buildFixtureResultsRoute('premiership', 'men'),
   };
   const homeTopMenuPanels = [
     {
@@ -485,14 +489,10 @@ export default function App() {
         ],
       },
     {
-      label: 'Tournaments',
-      href: homeMenuHrefMap.Tournaments,
+      label: 'Leagues',
+      href: homeMenuHrefMap.Leagues,
       featured: false,
-      links: [
-        { label: 'Central Fixtures', href: buildRegionRoute('Central', 'Fixtures') },
-        { label: 'Schools Cup', href: buildRegionRoute('Schools', 'Schools Cup') },
-        { label: 'National Team Fixtures', href: buildRegionRoute('National Team', 'Fixtures') },
-      ],
+      links: leagueMenuLinks,
     },
     {
       label: 'RIU',
@@ -508,11 +508,7 @@ export default function App() {
       label: 'Fixture & Results',
       href: homeMenuHrefMap['Fixture & Results'],
       featured: true,
-      links: [
-        { label: 'Central Fixtures', href: buildRegionRoute('Central', 'Fixtures') },
-        { label: 'Western Fixtures', href: buildRegionRoute('Western', 'Fixtures') },
-        { label: 'National Team Fixtures', href: buildRegionRoute('National Team', 'Fixtures') },
-      ],
+      links: fixtureResultsMenuLinks,
     },
   ] as const;
   const submenuPageMap = Object.fromEntries(
@@ -558,6 +554,8 @@ export default function App() {
   const clubRouteMatch = routeHash.match(/^#\/clubs\/([^/]+)\/([^/]+)\/([^/]+)$/);
   const activeClub = clubRouteMatch ? findRegionalClub(clubRouteMatch[1], clubRouteMatch[2]) : null;
   const activeClubTab = clubRouteMatch?.[3] ?? 'news';
+  const activeLeaguePage = getLeaguePage(routeHash);
+  const activeFixtureResultsPage = getFixtureResultsPage(routeHash);
 
   const availableCalendarDates = Array.from(new Set(fixtureResultCards.map((match) => match.fullDate)));
   const calendarMatches = fixtureResultCards.filter((match) => match.fullDate === selectedCalendarDate);
@@ -789,6 +787,14 @@ export default function App() {
     return <ClubProfilePage club={activeClub} activeTab={activeClubTab} />;
   }
 
+  if (activeLeaguePage) {
+    return <LeagueSubPage activePage={activeLeaguePage} onBack={() => setRouteHash('#/')} />;
+  }
+
+  if (activeFixtureResultsPage) {
+    return <FixtureResultsSubPage activePage={activeFixtureResultsPage} onBack={() => setRouteHash('#/')} />;
+  }
+
   if (isCentralMenRoute) {
     return (
       <CentralMen
@@ -868,7 +874,9 @@ export default function App() {
               </div>
             </div>
           </div>
-          <DesktopTopNav menus={homeTopMenuPanels} standaloneLink={{ label: 'Age Grade', href: homeMenuHrefMap['Age Grade'] }} />
+          <div className="hidden md:block">
+            <DesktopTopNav menus={homeTopMenuPanels} standaloneLink={{ label: 'Age Grade', href: homeMenuHrefMap['Age Grade'] }} />
+          </div>
         </div>
       </header>
 
@@ -886,7 +894,7 @@ export default function App() {
         ))}
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,8,12,0.28)_0%,rgba(4,8,12,0.4)_40%,rgba(3,5,8,0.76)_100%)]"></div>
 
-        <div className="absolute top-0 left-0 z-20 w-full overflow-hidden bg-black md:hidden">
+        <div className="absolute top-0 left-0 z-[90] w-full overflow-visible bg-black md:hidden">
           <div className="grid grid-cols-2 bg-black text-white">
             <div className="flex items-center justify-center gap-3 border-r border-white px-3 py-4">
               <CloudSun size={20} />

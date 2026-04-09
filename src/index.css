@@ -1,19 +1,45 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Lato", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+  --font-sans: "Barlow", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Barlow Condensed", ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  font-size: 15.5px;
 }
 
 body {
-  font-family: "Lato", sans-serif;
+  font-family: "Barlow", sans-serif;
+  font-size: 0.99rem;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
   color: #666;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Playfair Display", serif;
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.01em;
   color: #333;
+}
+
+button,
+a,
+label,
+input,
+select,
+textarea {
+  font-family: "Barlow", sans-serif;
+}
+
+:is(.font-serif) {
+  font-family: "Barlow Condensed", sans-serif !important;
+}
+
+:is(.font-sans) {
+  font-family: "Barlow", sans-serif !important;
 }
 
 .ticker-shell {
@@ -76,77 +102,41 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 section:not(.section-font-fixed) :is(.text-\[10px\], .text-\[11px\], .text-\[11\.5px\], .text-xs) {
-  font-size: 0.9375rem !important;
+  font-size: 0.71rem !important;
 }
 
-section:not(.section-font-fixed) :is(.sm\:text-sm, .md\:text-sm) {
-  font-size: 1.09375rem !important;
+section:not(.section-font-fixed) :is(.sm\:text-sm, .md\:text-sm, .text-sm) {
+  font-size: 0.84rem !important;
 }
 
-section:not(.section-font-fixed) :is(.text-sm) {
-  font-size: 1.09375rem !important;
+section:not(.section-font-fixed) :is(.sm\:text-base, .md\:text-base, .text-base) {
+  font-size: 0.96rem !important;
 }
 
-section:not(.section-font-fixed) :is(.sm\:text-base, .md\:text-base) {
-  font-size: 1.25rem !important;
+section:not(.section-font-fixed) :is(.sm\:text-lg, .md\:text-lg, .text-lg) {
+  font-size: 1.05rem !important;
 }
 
-section:not(.section-font-fixed) :is(.text-base) {
-  font-size: 1.25rem !important;
+section:not(.section-font-fixed) :is(.sm\:text-xl, .md\:text-xl, .text-xl) {
+  font-size: 1.18rem !important;
 }
 
-section:not(.section-font-fixed) :is(.sm\:text-lg, .md\:text-lg) {
-  font-size: 1.40625rem !important;
+section:not(.section-font-fixed) :is(.sm\:text-2xl, .md\:text-2xl, .text-2xl) {
+  font-size: 1.4rem !important;
 }
 
-section:not(.section-font-fixed) :is(.text-lg) {
-  font-size: 1.40625rem !important;
+section:not(.section-font-fixed) :is(.sm\:text-3xl, .md\:text-3xl, .text-3xl) {
+  font-size: 1.8rem !important;
 }
 
-section:not(.section-font-fixed) :is(.sm\:text-xl, .md\:text-xl) {
-  font-size: 1.5625rem !important;
+section:not(.section-font-fixed) :is(.sm\:text-4xl, .md\:text-4xl, .text-4xl) {
+  font-size: 2.22rem !important;
 }
 
-section:not(.section-font-fixed) :is(.text-xl) {
-  font-size: 1.5625rem !important;
+section:not(.section-font-fixed) :is(.sm\:text-5xl, .md\:text-5xl, .text-5xl) {
+  font-size: 2.7rem !important;
 }
 
-section:not(.section-font-fixed) :is(.sm\:text-2xl, .md\:text-2xl) {
-  font-size: 1.875rem !important;
-}
-
-section:not(.section-font-fixed) :is(.text-2xl) {
-  font-size: 1.875rem !important;
-}
-
-section:not(.section-font-fixed) :is(.sm\:text-3xl, .md\:text-3xl) {
-  font-size: 2.34375rem !important;
-}
-
-section:not(.section-font-fixed) :is(.text-3xl) {
-  font-size: 2.34375rem !important;
-}
-
-section:not(.section-font-fixed) :is(.sm\:text-4xl, .md\:text-4xl) {
-  font-size: 3rem !important;
-}
-
-section:not(.section-font-fixed) :is(.text-4xl) {
-  font-size: 3rem !important;
-}
-
-section:not(.section-font-fixed) :is(.sm\:text-5xl, .md\:text-5xl) {
-  font-size: 3.75rem !important;
-}
-
-section:not(.section-font-fixed) :is(.text-5xl) {
-  font-size: 3.75rem !important;
-}
-
-section:not(.section-font-fixed) :is(.sm\:text-6xl, .md\:text-6xl) {
-  font-size: 4.5rem !important;
-}
-
-section:not(.section-font-fixed) :is(.text-6xl) {
-  font-size: 4.5rem !important;
+section:not(.section-font-fixed) :is(.sm\:text-6xl, .md\:text-6xl, .text-6xl) {
+  font-size: 3.24rem !important;
 }

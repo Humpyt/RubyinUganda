@@ -7,7 +7,7 @@ const homeMenuHrefMap = {
   Latest: '#/',
   Teams: buildRegionRoute('Central', 'Men'),
   'Age Grade': buildRegionRoute('Schools', 'Boys'),
-  Tournaments: buildRegionRoute('Central', 'Fixtures'),
+  Leagues: '#/leagues/premiership/men',
   RIU: '#/shop/matchday-wear',
   'Fixture & Results': buildRegionRoute('Central', 'Fixtures'),
 } as const;
@@ -32,7 +32,7 @@ export default function SharedFooter() {
             <li><a href={homeMenuHrefMap.Latest} className="transition-colors hover:text-[#d6a327]">Latest</a></li>
             <li><a href={homeMenuHrefMap.Teams} className="transition-colors hover:text-[#d6a327]">Teams</a></li>
             <li><a href={homeMenuHrefMap['Age Grade']} className="transition-colors hover:text-[#d6a327]">Age Grade</a></li>
-            <li><a href={homeMenuHrefMap.Tournaments} className="transition-colors hover:text-[#d6a327]">Tournaments</a></li>
+            <li><a href={homeMenuHrefMap.Leagues} className="transition-colors hover:text-[#d6a327]">Leagues</a></li>
             <li><a href={homeMenuHrefMap.RIU} className="transition-colors hover:text-[#d6a327]">RIU</a></li>
             <li><a href={homeMenuHrefMap['Fixture & Results']} className="transition-colors hover:text-[#d6a327]">Fixture & Results</a></li>
           </ul>

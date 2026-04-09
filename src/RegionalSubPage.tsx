@@ -5,6 +5,8 @@ import RegionalClubDirectory from './RegionalClubDirectory';
 import DesktopTopNav from './DesktopTopNav';
 import MobileTopNav from './MobileTopNav';
 import SharedFooter from './SharedFooter';
+import { buildLeagueRoute, leagueMenuLinks } from './leaguePages';
+import { buildFixtureResultsRoute, fixtureResultsMenuLinks } from './fixtureResultsPages';
 
 interface RegionCard {
   title: string;
@@ -46,6 +48,20 @@ export default function RegionalSubPage({
   buildRegionRoute,
   onBack,
 }: RegionalSubPageProps) {
+  const getLeagueMenuRoute = () => {
+    switch (activePage.regionTitle) {
+      case 'Central':
+        return buildLeagueRoute('central', 'men');
+      case 'Eastern':
+        return buildLeagueRoute('eastern', 'men');
+      case 'Northern':
+        return buildLeagueRoute('northern', 'men');
+      case 'Western':
+        return buildLeagueRoute('western', 'men');
+      default:
+        return buildLeagueRoute('premiership', 'men');
+    }
+  };
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openMobileRegion, setOpenMobileRegion] = useState<string | null>(null);
   const [openDesktopRegion, setOpenDesktopRegion] = useState<string | null>(null);
@@ -136,9 +152,18 @@ export default function RegionalSubPage({
     Latest: '#/',
     Teams: buildRegionRoute(activePage.regionTitle, 'Men'),
     'Age Grade': buildRegionRoute('Schools', 'Boys'),
-    Tournaments: buildRegionRoute(activePage.regionTitle, featureLink),
+    Leagues: getLeagueMenuRoute(),
     RIU: '#/shop/matchday-wear',
-    'Fixture & Results': buildRegionRoute(activePage.regionTitle, featureLink),
+    'Fixture & Results':
+      activePage.regionTitle === 'Central'
+        ? buildFixtureResultsRoute('central', 'men')
+        : activePage.regionTitle === 'Eastern'
+          ? buildFixtureResultsRoute('eastern', 'men')
+          : activePage.regionTitle === 'Northern'
+            ? buildFixtureResultsRoute('northern', 'men')
+            : activePage.regionTitle === 'Western'
+              ? buildFixtureResultsRoute('western', 'men')
+              : buildFixtureResultsRoute('premiership', 'men'),
   };
   const topMenuPanels = [
     {
@@ -158,14 +183,10 @@ export default function RegionalSubPage({
       links: allTeamsMenuLinks,
     },
     {
-      label: 'Tournaments',
-      href: sectionMenuHrefMap.Tournaments,
+      label: 'Leagues',
+      href: sectionMenuHrefMap.Leagues,
       featured: false,
-      links: [
-        { label: `${activePage.regionTitle} ${featureLink}`, href: buildRegionRoute(activePage.regionTitle, featureLink) },
-        { label: `${activePage.regionTitle} Standings`, href: buildRegionRoute(activePage.regionTitle, activePanel.links.includes('Standings') ? 'Standings' : activePanel.links[activePanel.links.length - 1]) },
-        { label: 'Central Fixtures', href: buildRegionRoute('Central', 'Fixtures') },
-      ],
+      links: leagueMenuLinks,
     },
     {
       label: 'RIU',
@@ -180,11 +201,7 @@ export default function RegionalSubPage({
     {
       label: 'Fixture & Results',
       href: sectionMenuHrefMap['Fixture & Results'],
-      links: [
-        { label: `${activePage.regionTitle} ${featureLink}`, href: buildRegionRoute(activePage.regionTitle, featureLink) },
-        { label: `${activePage.regionTitle} Women`, href: buildRegionRoute(activePage.regionTitle, 'Women') },
-        { label: `${activePage.regionTitle} Men`, href: buildRegionRoute(activePage.regionTitle, 'Men') },
-      ],
+      links: fixtureResultsMenuLinks,
       featured: true,
     },
   ] as const;
@@ -213,12 +230,14 @@ export default function RegionalSubPage({
           <a href="#/" className="inline-flex items-center">
             <img src="/logo-cutout.png" alt="Rugby in Uganda" className="h-20 w-auto object-contain sm:h-24 lg:h-28" />
           </a>
-          <DesktopTopNav menus={topMenuPanels} standaloneLink={{ label: 'Age Grade', href: sectionMenuHrefMap['Age Grade'] }} />
+          <div className="hidden md:block">
+            <DesktopTopNav menus={topMenuPanels} standaloneLink={{ label: 'Age Grade', href: sectionMenuHrefMap['Age Grade'] }} />
+          </div>
         </div>
       </header>
 
       <main>
-        <section className="border-b border-white/10 bg-black md:hidden">
+        <section className="relative z-[90] border-b border-white/10 bg-black md:hidden">
           <div className="grid grid-cols-2 bg-black text-white">
             <div className="flex items-center justify-center gap-3 border-r border-white px-3 py-4">
               <CloudSun size={20} />

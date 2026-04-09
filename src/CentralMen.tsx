@@ -5,6 +5,8 @@ import RegionalClubDirectory from './RegionalClubDirectory';
 import DesktopTopNav from './DesktopTopNav';
 import MobileTopNav from './MobileTopNav';
 import SharedFooter from './SharedFooter';
+import { buildLeagueRoute, leagueMenuLinks } from './leaguePages';
+import { buildFixtureResultsRoute, fixtureResultsMenuLinks } from './fixtureResultsPages';
 
 interface RegionCard {
   title: string;
@@ -36,9 +38,9 @@ const menuHrefMap: Record<string, string> = {
   Latest: '#clubs-grid',
   Teams: '#/regions/central/men',
   'Age Grade': '#/regions/schools/boys',
-  Tournaments: '#/regions/central/fixtures',
+  Leagues: buildLeagueRoute('central', 'men'),
   RIU: '#clubs-grid',
-  'Fixture & Results': '#/regions/central/fixtures',
+  'Fixture & Results': buildFixtureResultsRoute('central', 'men'),
 };
 
 export default function CentralMen({
@@ -132,14 +134,10 @@ export default function CentralMen({
       ],
     },
     {
-      label: 'Tournaments',
-      href: menuHrefMap.Tournaments,
+      label: 'Leagues',
+      href: menuHrefMap.Leagues,
       featured: false,
-      links: [
-        { label: 'Central Fixtures', href: buildRegionRoute('Central', 'Fixtures') },
-        { label: 'Central Standings', href: buildRegionRoute('Central', 'Standings') },
-        { label: 'Schools Rugby', href: buildRegionRoute('Schools', 'Boys') },
-      ],
+      links: leagueMenuLinks,
     },
     {
       label: 'RIU',
@@ -155,11 +153,7 @@ export default function CentralMen({
       label: 'Fixture & Results',
       href: menuHrefMap['Fixture & Results'],
       featured: true,
-      links: [
-        { label: 'Central Fixtures', href: buildRegionRoute('Central', 'Fixtures') },
-        { label: 'Central Standings', href: buildRegionRoute('Central', 'Standings') },
-        { label: 'Central Women', href: buildRegionRoute('Central', 'Women') },
-      ],
+      links: fixtureResultsMenuLinks,
     },
   ] as const;
   useEffect(() => {
@@ -205,12 +199,14 @@ export default function CentralMen({
             <img src="/logo-cutout.png" alt="Rugby in Uganda" className="h-20 w-auto object-contain sm:h-24 lg:h-28" />
           </a>
 
-          <DesktopTopNav menus={topMenuPanels} standaloneLink={{ label: 'Age Grade', href: menuHrefMap['Age Grade'] }} />
+          <div className="hidden md:block">
+            <DesktopTopNav menus={topMenuPanels} standaloneLink={{ label: 'Age Grade', href: menuHrefMap['Age Grade'] }} />
+          </div>
         </div>
       </header>
 
       <main>
-        <section className="border-b border-white/10 bg-black md:hidden">
+        <section className="relative z-[90] border-b border-white/10 bg-black md:hidden">
           <div className="grid grid-cols-2 bg-black text-white">
             <div className="flex items-center justify-center gap-3 border-r border-white px-3 py-4">
               <CloudSun size={20} />

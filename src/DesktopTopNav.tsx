@@ -61,6 +61,9 @@ export default function DesktopTopNav({ menus, standaloneLink }: DesktopTopNavPr
                     key={`${menu.label}-${link.label}`}
                     type="button"
                     onClick={() => {
+                      if (menu.label === 'Leagues') {
+                        window.sessionStorage.setItem('pendingScrollTarget', 'league-standings');
+                      }
                       handleNavigate(
                         link.href,
                         menu.label === 'Teams' && ['Central', 'Northern', 'Eastern', 'Western', 'Schools', 'National Team'].includes(link.label)
