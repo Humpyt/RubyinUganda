@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import type { MouseEvent as ReactMouseEvent, TouchEvent as ReactTouchEvent } from 'react';
 import { ChevronDown, Calendar, Menu, CloudSun, Facebook, Info, Send, MessageCircle, Globe, Phone } from 'lucide-react';
+import CentralMen from './CentralMen';
+import RegionalSubPage from './RegionalSubPage';
+import DesktopTopNav from './DesktopTopNav';
+import ClubProfilePage from './ClubProfilePage';
+import MobileTopNav from './MobileTopNav';
+import SharedFooter from './SharedFooter';
+import { findRegionalClub } from './regionalClubs';
 
 export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -10,9 +18,72 @@ export default function App() {
   const [selectedPollOption, setSelectedPollOption] = useState<'rams' | 'draw' | 'eagles' | null>(null);
   const [selectedSponsorClub, setSelectedSponsorClub] = useState('Eagles RFC');
   const [selectedFixtureIndex, setSelectedFixtureIndex] = useState(0);
-  const [fixtureDeckMode, setFixtureDeckMode] = useState<'fixtures' | 'results' | 'standings'>('fixtures');
+  const [fixtureDeckMode, setFixtureDeckMode] = useState<'fixtures' | 'results' | 'calendar' | 'standings' | 'performance'>('fixtures');
   const [selectedStandingsDivision, setSelectedStandingsDivision] = useState('Premiership');
+  const [selectedStandingsLeague, setSelectedStandingsLeague] = useState<'men' | 'women'>('men');
+  const [selectedPerformanceDivision, setSelectedPerformanceDivision] = useState('Premiership');
+  const [selectedPerformanceLeague, setSelectedPerformanceLeague] = useState<'men' | 'women'>('men');
+  const [selectedPerformanceMetric, setSelectedPerformanceMetric] = useState<'most tries' | 'most points' | 'motm awards'>('most tries');
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState('2026-05-16');
+  const [selectedCalendarMonth, setSelectedCalendarMonth] = useState('2026-05');
   const [routeHash, setRouteHash] = useState(() => window.location.hash || '#/');
+  const [openDesktopRegion, setOpenDesktopRegion] = useState<string | null>(null);
+  const canUseHover = typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const clubDirectoryScrollTarget = 'clubs-grid';
+  const handleTopMenuNavigation = (href: string) => {
+    setIsMobileMenuOpen(false);
+
+    if (href.startsWith('#')) {
+      window.location.hash = href.slice(1);
+      return;
+    }
+
+    window.location.href = href;
+  };
+  const closeRegionalMenus = () => {
+    setOpenDesktopRegion(null);
+    setOpenMobileRegion(null);
+    setIsMobileMenuOpen(false);
+  };
+  const getDefaultRegionRoute = (regionTitle: string) => {
+    const regionPanel = desktopRegionPanels.find((panel) => panel.title === regionTitle);
+    return buildRegionRoute(regionTitle, regionPanel?.links[0] ?? 'Men');
+  };
+  const scrollToClubDirectory = () => {
+    const target = document.getElementById(clubDirectoryScrollTarget);
+    if (!target) {
+      return false;
+    }
+
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return true;
+  };
+  const handleRegionalNavigation = (href: string) => {
+    closeRegionalMenus();
+    window.sessionStorage.setItem('pendingScrollTarget', clubDirectoryScrollTarget);
+
+    if (href === (window.location.hash || '#/')) {
+      window.setTimeout(() => {
+        scrollToClubDirectory();
+      }, 20);
+      return;
+    }
+
+    if (href.startsWith('#')) {
+      window.location.hash = href.slice(1);
+      return;
+    }
+
+    window.location.href = href;
+  };
+  const handleImmediateRegionalNavigation = (
+    event: ReactMouseEvent<HTMLButtonElement> | ReactTouchEvent<HTMLButtonElement>,
+    href: string,
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+    handleRegionalNavigation(href);
+  };
 
   const tickerItems = [
     'FT Ewes 36-27 She Wolves | 28 Mar',
@@ -82,7 +153,7 @@ export default function App() {
       image: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&q=80&w=1200',
       align: 'right',
     },
-  ];
+  ] as const;
 
   const heroSlides = [
     '/slider/one.jpg',
@@ -108,6 +179,7 @@ export default function App() {
   const fixtureResultCards = [
     {
       stage: 'Top 14 - J24',
+      fullDate: '2026-05-16',
       date: '16 May',
       time: '00h00',
       home: 'Kobs RFC',
@@ -122,6 +194,7 @@ export default function App() {
     },
     {
       stage: 'Top 14 - J25',
+      fullDate: '2026-05-30',
       date: '30 May',
       time: '00h00',
       home: 'Eagles RFC',
@@ -136,6 +209,7 @@ export default function App() {
     },
     {
       stage: 'Top 14 - J26',
+      fullDate: '2026-06-06',
       date: '06 Jun',
       time: '00h00',
       home: 'Hippos RFC',
@@ -152,36 +226,217 @@ export default function App() {
 
   const standingsByDivision = {
     Premiership: [
-      { rank: 1, team: 'Kobs RFC', played: 12, points: 71 },
-      { rank: 2, team: 'Eagles RFC', played: 12, points: 59 },
-      { rank: 3, team: 'Pirates RFC', played: 12, points: 55 },
-      { rank: 4, team: 'Hippos RFC', played: 12, points: 52 },
-      { rank: 5, team: 'Walukuba', played: 12, points: 46 },
+      { rank: 1, team: 'Kobs RFC', played: 12, won: 10, drawn: 1, lost: 1, points: 71, form: ['W', 'L', 'W', 'W', 'L'] },
+      { rank: 2, team: 'Eagles RFC', played: 12, won: 9, drawn: 2, lost: 1, points: 59, form: ['W', 'W', 'W', 'W', 'L'] },
+      { rank: 3, team: 'Pirates RFC', played: 12, won: 8, drawn: 3, lost: 1, points: 55, form: ['W', 'W', 'W', 'W', 'L'] },
+      { rank: 4, team: 'Hippos RFC', played: 12, won: 8, drawn: 1, lost: 3, points: 52, form: ['W', 'W', 'L', 'W', 'W'] },
+      { rank: 5, team: 'Walukuba', played: 12, won: 7, drawn: 2, lost: 3, points: 46, form: ['D', 'W', 'W', 'L', 'W'] },
     ],
     Eastern: [
-      { rank: 1, team: 'Walukuba', played: 10, points: 41 },
-      { rank: 2, team: 'Jinja Hippos II', played: 10, points: 37 },
-      { rank: 3, team: 'Mongers', played: 10, points: 33 },
-      { rank: 4, team: 'Elgon Wolves', played: 10, points: 26 },
+      { rank: 1, team: 'Walukuba', played: 10, won: 8, drawn: 1, lost: 1, points: 41, form: ['W', 'W', 'W', 'D', 'W'] },
+      { rank: 2, team: 'Jinja Hippos II', played: 10, won: 7, drawn: 1, lost: 2, points: 37, form: ['W', 'L', 'W', 'W', 'W'] },
+      { rank: 3, team: 'Mongers', played: 10, won: 6, drawn: 1, lost: 3, points: 33, form: ['L', 'W', 'W', 'L', 'W'] },
+      { rank: 4, team: 'Elgon Wolves', played: 10, won: 4, drawn: 2, lost: 4, points: 26, form: ['W', 'D', 'L', 'L', 'W'] },
     ],
     Northern: [
-      { rank: 1, team: 'Gulu City', played: 8, points: 29 },
-      { rank: 2, team: 'Lira Bulls', played: 8, points: 24 },
-      { rank: 3, team: 'Arua Rhinos', played: 8, points: 19 },
-      { rank: 4, team: 'Kitgum Giants', played: 8, points: 12 },
+      { rank: 1, team: 'Gulu City', played: 8, won: 6, drawn: 1, lost: 1, points: 29, form: ['W', 'W', 'D', 'W', 'L'] },
+      { rank: 2, team: 'Lira Bulls', played: 8, won: 5, drawn: 1, lost: 2, points: 24, form: ['W', 'L', 'W', 'D', 'W'] },
+      { rank: 3, team: 'Arua Rhinos', played: 8, won: 3, drawn: 2, lost: 3, points: 19, form: ['L', 'W', 'L', 'W', 'D'] },
+      { rank: 4, team: 'Kitgum Giants', played: 8, won: 2, drawn: 0, lost: 6, points: 12, form: ['L', 'L', 'W', 'L', 'L'] },
     ],
     Western: [
-      { rank: 1, team: 'Buffaloes West', played: 9, points: 35 },
-      { rank: 2, team: 'Mbarara Hawks', played: 9, points: 31 },
-      { rank: 3, team: 'Kasese Select', played: 9, points: 24 },
-      { rank: 4, team: 'Fort Portal', played: 9, points: 16 },
+      { rank: 1, team: 'Buffaloes West', played: 9, won: 7, drawn: 1, lost: 1, points: 35, form: ['W', 'W', 'W', 'L', 'W'] },
+      { rank: 2, team: 'Mbarara Hawks', played: 9, won: 6, drawn: 1, lost: 2, points: 31, form: ['W', 'D', 'W', 'W', 'L'] },
+      { rank: 3, team: 'Kasese Select', played: 9, won: 4, drawn: 2, lost: 3, points: 24, form: ['L', 'W', 'D', 'L', 'W'] },
+      { rank: 4, team: 'Fort Portal', played: 9, won: 2, drawn: 2, lost: 5, points: 16, form: ['L', 'L', 'W', 'L', 'D'] },
     ],
     Central: [
-      { rank: 1, team: 'Ewes', played: 11, points: 44 },
-      { rank: 2, team: 'She Wolves', played: 11, points: 39 },
-      { rank: 3, team: 'Impis', played: 11, points: 34 },
-      { rank: 4, team: 'Thunderbirds', played: 11, points: 22 },
+      { rank: 1, team: 'Ewes', played: 11, won: 9, drawn: 0, lost: 2, points: 44, form: ['W', 'W', 'L', 'W', 'W'] },
+      { rank: 2, team: 'She Wolves', played: 11, won: 8, drawn: 1, lost: 2, points: 39, form: ['W', 'D', 'W', 'L', 'W'] },
+      { rank: 3, team: 'Impis', played: 11, won: 6, drawn: 2, lost: 3, points: 34, form: ['L', 'W', 'W', 'D', 'L'] },
+      { rank: 4, team: 'Thunderbirds', played: 11, won: 4, drawn: 2, lost: 5, points: 22, form: ['L', 'L', 'W', 'D', 'L'] },
     ],
+  } as const;
+
+  const womensStandingsByDivision = {
+    Premiership: [
+      { rank: 1, team: 'Ewes', played: 6, won: 5, drawn: 0, lost: 1, points: 16, form: ['W', 'L', 'W', 'W', 'W'] },
+      { rank: 2, team: 'She Wolves', played: 6, won: 5, drawn: 0, lost: 1, points: 16, form: ['W', 'W', 'W', 'W', 'L'] },
+      { rank: 3, team: 'Thunderbirds', played: 6, won: 4, drawn: 1, lost: 1, points: 14, form: ['W', 'W', 'D', 'W', 'L'] },
+      { rank: 4, team: 'Impis', played: 6, won: 4, drawn: 0, lost: 2, points: 13, form: ['W', 'L', 'W', 'W', 'L'] },
+      { rank: 5, team: 'Black Pearls', played: 6, won: 3, drawn: 2, lost: 1, points: 12, form: ['D', 'W', 'W', 'L', 'D'] },
+    ],
+    Eastern: [
+      { rank: 1, team: 'Jinja Queens', played: 6, won: 5, drawn: 0, lost: 1, points: 15, form: ['W', 'W', 'L', 'W', 'W'] },
+      { rank: 2, team: 'Walukuba Ladies', played: 6, won: 4, drawn: 1, lost: 1, points: 13, form: ['W', 'D', 'W', 'W', 'L'] },
+      { rank: 3, team: 'Mongers Ladies', played: 6, won: 3, drawn: 1, lost: 2, points: 10, form: ['L', 'W', 'D', 'L', 'W'] },
+      { rank: 4, team: 'Elgon Queens', played: 6, won: 2, drawn: 0, lost: 4, points: 6, form: ['L', 'L', 'W', 'L', 'L'] },
+    ],
+    Northern: [
+      { rank: 1, team: 'Gulu Queens', played: 5, won: 4, drawn: 0, lost: 1, points: 12, form: ['W', 'W', 'L', 'W', 'W'] },
+      { rank: 2, team: 'Lira Ladies', played: 5, won: 3, drawn: 1, lost: 1, points: 10, form: ['W', 'D', 'W', 'L', 'W'] },
+      { rank: 3, team: 'Arua Queens', played: 5, won: 2, drawn: 1, lost: 2, points: 7, form: ['L', 'W', 'D', 'L', 'W'] },
+      { rank: 4, team: 'Kitgum Sisters', played: 5, won: 1, drawn: 0, lost: 4, points: 3, form: ['L', 'L', 'W', 'L', 'L'] },
+    ],
+    Western: [
+      { rank: 1, team: 'Buffaloes Ladies', played: 5, won: 4, drawn: 0, lost: 1, points: 12, form: ['W', 'W', 'W', 'L', 'W'] },
+      { rank: 2, team: 'Mbarara Queens', played: 5, won: 3, drawn: 1, lost: 1, points: 10, form: ['W', 'D', 'W', 'W', 'L'] },
+      { rank: 3, team: 'Kasese Ladies', played: 5, won: 2, drawn: 1, lost: 2, points: 7, form: ['L', 'W', 'D', 'L', 'W'] },
+      { rank: 4, team: 'Fort Portal Women', played: 5, won: 1, drawn: 0, lost: 4, points: 3, form: ['L', 'L', 'W', 'L', 'L'] },
+    ],
+    Central: [
+      { rank: 1, team: 'Ewes', played: 6, won: 5, drawn: 0, lost: 1, points: 16, form: ['W', 'W', 'L', 'W', 'W'] },
+      { rank: 2, team: 'She Wolves', played: 6, won: 5, drawn: 0, lost: 1, points: 16, form: ['W', 'D', 'W', 'W', 'W'] },
+      { rank: 3, team: 'Thunderbirds', played: 6, won: 4, drawn: 1, lost: 1, points: 14, form: ['W', 'W', 'D', 'L', 'W'] },
+      { rank: 4, team: 'Impis', played: 6, won: 3, drawn: 1, lost: 2, points: 10, form: ['L', 'W', 'W', 'D', 'L'] },
+    ],
+  } as const;
+
+  const performanceBoards = {
+    men: {
+      Premiership: {
+        'most tries': [
+          ['Pius Ogena', 'Pirates RFC', 11], ['Michael Wokorach', 'Hippos RFC', 10], ['Ivan Magomu', 'Eagles RFC', 9], ['Philip Wokorach', 'Kobs RFC', 9], ['Brian Odongo', 'Walukuba', 8],
+          ['Solomon Okia', 'Kobs RFC', 8], ['Juma Kisa', 'Eagles RFC', 7], ['Mark Kateera', 'Pirates RFC', 7], ['Ben Mawa', 'Hippos RFC', 6], ['Isaac Massa', 'Walukuba', 6],
+        ],
+        'most points': [
+          ['Ivan Magomu', 'Eagles RFC', 96], ['Joseph Aredo', 'Kobs RFC', 91], ['Pius Ogena', 'Pirates RFC', 77], ['Michael Wokorach', 'Hippos RFC', 73], ['Brian Odongo', 'Walukuba', 68],
+          ['Philip Wokorach', 'Kobs RFC', 64], ['Juma Kisa', 'Eagles RFC', 59], ['Mark Kateera', 'Pirates RFC', 55], ['Ben Mawa', 'Hippos RFC', 48], ['Isaac Massa', 'Walukuba', 44],
+        ],
+        'motm awards': [
+          ['Ivan Magomu', 'Eagles RFC', 4], ['Joseph Aredo', 'Kobs RFC', 4], ['Pius Ogena', 'Pirates RFC', 3], ['Michael Wokorach', 'Hippos RFC', 3], ['Brian Odongo', 'Walukuba', 3],
+          ['Philip Wokorach', 'Kobs RFC', 2], ['Juma Kisa', 'Eagles RFC', 2], ['Mark Kateera', 'Pirates RFC', 2], ['Ben Mawa', 'Hippos RFC', 1], ['Isaac Massa', 'Walukuba', 1],
+        ],
+      },
+      Eastern: {
+        'most tries': [
+          ['Joel Eyu', 'Walukuba', 9], ['Peter Sera', 'Jinja Hippos II', 8], ['Paul Mugisha', 'Mongers', 8], ['David Oola', 'Elgon Wolves', 7], ['Frank Iga', 'Walukuba', 7],
+          ['Sam Were', 'Jinja Hippos II', 6], ['Moses Tabu', 'Mongers', 6], ['Bashir Wanyama', 'Elgon Wolves', 5], ['Isaac Juma', 'Walukuba', 5], ['Enock Wafula', 'Mongers', 4],
+        ],
+        'most points': [
+          ['Joel Eyu', 'Walukuba', 74], ['Peter Sera', 'Jinja Hippos II', 66], ['Paul Mugisha', 'Mongers', 61], ['David Oola', 'Elgon Wolves', 53], ['Frank Iga', 'Walukuba', 51],
+          ['Sam Were', 'Jinja Hippos II', 46], ['Moses Tabu', 'Mongers', 44], ['Bashir Wanyama', 'Elgon Wolves', 39], ['Isaac Juma', 'Walukuba', 37], ['Enock Wafula', 'Mongers', 31],
+        ],
+        'motm awards': [
+          ['Joel Eyu', 'Walukuba', 4], ['Peter Sera', 'Jinja Hippos II', 3], ['Paul Mugisha', 'Mongers', 3], ['David Oola', 'Elgon Wolves', 2], ['Frank Iga', 'Walukuba', 2],
+          ['Sam Were', 'Jinja Hippos II', 2], ['Moses Tabu', 'Mongers', 2], ['Bashir Wanyama', 'Elgon Wolves', 1], ['Isaac Juma', 'Walukuba', 1], ['Enock Wafula', 'Mongers', 1],
+        ],
+      },
+      Northern: {
+        'most tries': [
+          ['Charles Otto', 'Gulu City', 7], ['Denis Okot', 'Lira Bulls', 6], ['Amani Dradri', 'Arua Rhinos', 6], ['Robert Lagum', 'Kitgum Giants', 5], ['Moses Ocan', 'Gulu City', 5],
+          ['Sam Otema', 'Lira Bulls', 5], ['Hamis Atim', 'Arua Rhinos', 4], ['Paul Lokiru', 'Kitgum Giants', 4], ['Ben Oyo', 'Gulu City', 4], ['Isaac Lokele', 'Lira Bulls', 3],
+        ],
+        'most points': [
+          ['Charles Otto', 'Gulu City', 58], ['Denis Okot', 'Lira Bulls', 49], ['Amani Dradri', 'Arua Rhinos', 47], ['Robert Lagum', 'Kitgum Giants', 38], ['Moses Ocan', 'Gulu City', 36],
+          ['Sam Otema', 'Lira Bulls', 35], ['Hamis Atim', 'Arua Rhinos', 29], ['Paul Lokiru', 'Kitgum Giants', 26], ['Ben Oyo', 'Gulu City', 24], ['Isaac Lokele', 'Lira Bulls', 22],
+        ],
+        'motm awards': [
+          ['Charles Otto', 'Gulu City', 3], ['Denis Okot', 'Lira Bulls', 3], ['Amani Dradri', 'Arua Rhinos', 2], ['Robert Lagum', 'Kitgum Giants', 2], ['Moses Ocan', 'Gulu City', 2],
+          ['Sam Otema', 'Lira Bulls', 1], ['Hamis Atim', 'Arua Rhinos', 1], ['Paul Lokiru', 'Kitgum Giants', 1], ['Ben Oyo', 'Gulu City', 1], ['Isaac Lokele', 'Lira Bulls', 1],
+        ],
+      },
+      Western: {
+        'most tries': [
+          ['John Businge', 'Buffaloes West', 8], ['Kevin Mwesige', 'Mbarara Hawks', 7], ['Ivan Muhumuza', 'Kasese Select', 6], ['Peter Kato', 'Fort Portal', 5], ['Brian Aruhanga', 'Buffaloes West', 5],
+          ['Mark Tumuheki', 'Mbarara Hawks', 5], ['Joel Bwambale', 'Kasese Select', 4], ['Moses Atuheire', 'Fort Portal', 4], ['Allan Mugisha', 'Buffaloes West', 4], ['David Nuwagaba', 'Mbarara Hawks', 3],
+        ],
+        'most points': [
+          ['John Businge', 'Buffaloes West', 63], ['Kevin Mwesige', 'Mbarara Hawks', 56], ['Ivan Muhumuza', 'Kasese Select', 46], ['Peter Kato', 'Fort Portal', 39], ['Brian Aruhanga', 'Buffaloes West', 37],
+          ['Mark Tumuheki', 'Mbarara Hawks', 35], ['Joel Bwambale', 'Kasese Select', 31], ['Moses Atuheire', 'Fort Portal', 27], ['Allan Mugisha', 'Buffaloes West', 25], ['David Nuwagaba', 'Mbarara Hawks', 21],
+        ],
+        'motm awards': [
+          ['John Businge', 'Buffaloes West', 3], ['Kevin Mwesige', 'Mbarara Hawks', 3], ['Ivan Muhumuza', 'Kasese Select', 2], ['Peter Kato', 'Fort Portal', 2], ['Brian Aruhanga', 'Buffaloes West', 2],
+          ['Mark Tumuheki', 'Mbarara Hawks', 1], ['Joel Bwambale', 'Kasese Select', 1], ['Moses Atuheire', 'Fort Portal', 1], ['Allan Mugisha', 'Buffaloes West', 1], ['David Nuwagaba', 'Mbarara Hawks', 1],
+        ],
+      },
+      Central: {
+        'most tries': [
+          ['Sarah Nansubuga', 'Ewes', 9], ['Grace Adong', 'She Wolves', 8], ['Lydia Okello', 'Impis', 7], ['Peace Atim', 'Thunderbirds', 6], ['Mildred Auma', 'Ewes', 6],
+          ['Deborah Nakanjako', 'She Wolves', 5], ['Fiona Nabukalu', 'Impis', 5], ['Joy Atukunda', 'Thunderbirds', 4], ['Patricia Kato', 'Ewes', 4], ['Shamim Namusoke', 'She Wolves', 4],
+        ],
+        'most points': [
+          ['Sarah Nansubuga', 'Ewes', 72], ['Grace Adong', 'She Wolves', 66], ['Lydia Okello', 'Impis', 57], ['Peace Atim', 'Thunderbirds', 49], ['Mildred Auma', 'Ewes', 46],
+          ['Deborah Nakanjako', 'She Wolves', 43], ['Fiona Nabukalu', 'Impis', 39], ['Joy Atukunda', 'Thunderbirds', 31], ['Patricia Kato', 'Ewes', 29], ['Shamim Namusoke', 'She Wolves', 28],
+        ],
+        'motm awards': [
+          ['Sarah Nansubuga', 'Ewes', 4], ['Grace Adong', 'She Wolves', 3], ['Lydia Okello', 'Impis', 3], ['Peace Atim', 'Thunderbirds', 2], ['Mildred Auma', 'Ewes', 2],
+          ['Deborah Nakanjako', 'She Wolves', 2], ['Fiona Nabukalu', 'Impis', 1], ['Joy Atukunda', 'Thunderbirds', 1], ['Patricia Kato', 'Ewes', 1], ['Shamim Namusoke', 'She Wolves', 1],
+        ],
+      },
+    },
+    women: {
+      Premiership: {
+        'most tries': [
+          ['Shadia Nankya', 'Ewes', 10], ['Lorna Adhiambo', 'She Wolves', 9], ['Ritah Namiiro', 'Thunderbirds', 8], ['Stella Ayikoru', 'Impis', 7], ['Joan Auma', 'Black Pearls', 7],
+          ['Mercy Nabisere', 'Ewes', 6], ['Hellen Akello', 'She Wolves', 6], ['Janet Mirembe', 'Thunderbirds', 5], ['Aisha Namutebi', 'Impis', 5], ['Doreen Nampijja', 'Black Pearls', 4],
+        ],
+        'most points': [
+          ['Shadia Nankya', 'Ewes', 84], ['Lorna Adhiambo', 'She Wolves', 78], ['Ritah Namiiro', 'Thunderbirds', 69], ['Stella Ayikoru', 'Impis', 61], ['Joan Auma', 'Black Pearls', 58],
+          ['Mercy Nabisere', 'Ewes', 47], ['Hellen Akello', 'She Wolves', 44], ['Janet Mirembe', 'Thunderbirds', 40], ['Aisha Namutebi', 'Impis', 38], ['Doreen Nampijja', 'Black Pearls', 33],
+        ],
+        'motm awards': [
+          ['Shadia Nankya', 'Ewes', 4], ['Lorna Adhiambo', 'She Wolves', 4], ['Ritah Namiiro', 'Thunderbirds', 3], ['Stella Ayikoru', 'Impis', 3], ['Joan Auma', 'Black Pearls', 2],
+          ['Mercy Nabisere', 'Ewes', 2], ['Hellen Akello', 'She Wolves', 2], ['Janet Mirembe', 'Thunderbirds', 1], ['Aisha Namutebi', 'Impis', 1], ['Doreen Nampijja', 'Black Pearls', 1],
+        ],
+      },
+      Eastern: {
+        'most tries': [
+          ['Achen Faith', 'Jinja Queens', 8], ['Gloria Auma', 'Walukuba Ladies', 7], ['Tracy Nandutu', 'Mongers Ladies', 6], ['Hellen Nabalayo', 'Elgon Queens', 5], ['Racheal Auma', 'Jinja Queens', 5],
+          ['Shakira Nakitto', 'Walukuba Ladies', 5], ['Patience Nanyonga', 'Mongers Ladies', 4], ['Ruth Wabwire', 'Elgon Queens', 4], ['Maria Namubiru', 'Jinja Queens', 3], ['Susan Nagawa', 'Walukuba Ladies', 3],
+        ],
+        'most points': [
+          ['Achen Faith', 'Jinja Queens', 65], ['Gloria Auma', 'Walukuba Ladies', 58], ['Tracy Nandutu', 'Mongers Ladies', 49], ['Hellen Nabalayo', 'Elgon Queens', 38], ['Racheal Auma', 'Jinja Queens', 36],
+          ['Shakira Nakitto', 'Walukuba Ladies', 35], ['Patience Nanyonga', 'Mongers Ladies', 31], ['Ruth Wabwire', 'Elgon Queens', 27], ['Maria Namubiru', 'Jinja Queens', 22], ['Susan Nagawa', 'Walukuba Ladies', 20],
+        ],
+        'motm awards': [
+          ['Achen Faith', 'Jinja Queens', 3], ['Gloria Auma', 'Walukuba Ladies', 3], ['Tracy Nandutu', 'Mongers Ladies', 2], ['Hellen Nabalayo', 'Elgon Queens', 2], ['Racheal Auma', 'Jinja Queens', 2],
+          ['Shakira Nakitto', 'Walukuba Ladies', 1], ['Patience Nanyonga', 'Mongers Ladies', 1], ['Ruth Wabwire', 'Elgon Queens', 1], ['Maria Namubiru', 'Jinja Queens', 1], ['Susan Nagawa', 'Walukuba Ladies', 1],
+        ],
+      },
+      Northern: {
+        'most tries': [
+          ['Jackline Aciro', 'Gulu Queens', 7], ['Peace Amongi', 'Lira Ladies', 6], ['Sharon Anying', 'Arua Queens', 5], ['Diana Aber', 'Kitgum Sisters', 4], ['Esther Apio', 'Gulu Queens', 4],
+          ['Brenda Ayo', 'Lira Ladies', 4], ['Miriam Atim', 'Arua Queens', 3], ['Stella Aber', 'Kitgum Sisters', 3], ['Susan Akello', 'Gulu Queens', 2], ['Hope Aciro', 'Lira Ladies', 2],
+        ],
+        'most points': [
+          ['Jackline Aciro', 'Gulu Queens', 54], ['Peace Amongi', 'Lira Ladies', 47], ['Sharon Anying', 'Arua Queens', 39], ['Diana Aber', 'Kitgum Sisters', 28], ['Esther Apio', 'Gulu Queens', 26],
+          ['Brenda Ayo', 'Lira Ladies', 24], ['Miriam Atim', 'Arua Queens', 21], ['Stella Aber', 'Kitgum Sisters', 19], ['Susan Akello', 'Gulu Queens', 14], ['Hope Aciro', 'Lira Ladies', 13],
+        ],
+        'motm awards': [
+          ['Jackline Aciro', 'Gulu Queens', 3], ['Peace Amongi', 'Lira Ladies', 2], ['Sharon Anying', 'Arua Queens', 2], ['Diana Aber', 'Kitgum Sisters', 1], ['Esther Apio', 'Gulu Queens', 1],
+          ['Brenda Ayo', 'Lira Ladies', 1], ['Miriam Atim', 'Arua Queens', 1], ['Stella Aber', 'Kitgum Sisters', 1], ['Susan Akello', 'Gulu Queens', 1], ['Hope Aciro', 'Lira Ladies', 1],
+        ],
+      },
+      Western: {
+        'most tries': [
+          ['Naomi Kiconco', 'Buffaloes Ladies', 7], ['Sandra Kato', 'Mbarara Queens', 6], ['Lillian Biira', 'Kasese Ladies', 5], ['Mercy Kemigisha', 'Fort Portal Women', 4], ['Ruth Kyomuhendo', 'Buffaloes Ladies', 4],
+          ['Brenda Tushabe', 'Mbarara Queens', 4], ['Esther Biira', 'Kasese Ladies', 3], ['Hilda Kabugho', 'Fort Portal Women', 3], ['Joy Karungi', 'Buffaloes Ladies', 2], ['Patience Kobusinge', 'Mbarara Queens', 2],
+        ],
+        'most points': [
+          ['Naomi Kiconco', 'Buffaloes Ladies', 52], ['Sandra Kato', 'Mbarara Queens', 45], ['Lillian Biira', 'Kasese Ladies', 37], ['Mercy Kemigisha', 'Fort Portal Women', 29], ['Ruth Kyomuhendo', 'Buffaloes Ladies', 27],
+          ['Brenda Tushabe', 'Mbarara Queens', 25], ['Esther Biira', 'Kasese Ladies', 21], ['Hilda Kabugho', 'Fort Portal Women', 18], ['Joy Karungi', 'Buffaloes Ladies', 14], ['Patience Kobusinge', 'Mbarara Queens', 13],
+        ],
+        'motm awards': [
+          ['Naomi Kiconco', 'Buffaloes Ladies', 3], ['Sandra Kato', 'Mbarara Queens', 2], ['Lillian Biira', 'Kasese Ladies', 2], ['Mercy Kemigisha', 'Fort Portal Women', 1], ['Ruth Kyomuhendo', 'Buffaloes Ladies', 1],
+          ['Brenda Tushabe', 'Mbarara Queens', 1], ['Esther Biira', 'Kasese Ladies', 1], ['Hilda Kabugho', 'Fort Portal Women', 1], ['Joy Karungi', 'Buffaloes Ladies', 1], ['Patience Kobusinge', 'Mbarara Queens', 1],
+        ],
+      },
+      Central: {
+        'most tries': [
+          ['Shadia Nankya', 'Ewes', 10], ['Lorna Adhiambo', 'She Wolves', 9], ['Ritah Namiiro', 'Thunderbirds', 8], ['Stella Ayikoru', 'Impis', 7], ['Mercy Nabisere', 'Ewes', 6],
+          ['Hellen Akello', 'She Wolves', 6], ['Janet Mirembe', 'Thunderbirds', 5], ['Aisha Namutebi', 'Impis', 5], ['Patricia Nankunda', 'Ewes', 4], ['Faridah Nakitende', 'She Wolves', 4],
+        ],
+        'most points': [
+          ['Shadia Nankya', 'Ewes', 84], ['Lorna Adhiambo', 'She Wolves', 78], ['Ritah Namiiro', 'Thunderbirds', 69], ['Stella Ayikoru', 'Impis', 61], ['Mercy Nabisere', 'Ewes', 47],
+          ['Hellen Akello', 'She Wolves', 44], ['Janet Mirembe', 'Thunderbirds', 40], ['Aisha Namutebi', 'Impis', 38], ['Patricia Nankunda', 'Ewes', 30], ['Faridah Nakitende', 'She Wolves', 29],
+        ],
+        'motm awards': [
+          ['Shadia Nankya', 'Ewes', 4], ['Lorna Adhiambo', 'She Wolves', 4], ['Ritah Namiiro', 'Thunderbirds', 3], ['Stella Ayikoru', 'Impis', 3], ['Mercy Nabisere', 'Ewes', 2],
+          ['Hellen Akello', 'She Wolves', 2], ['Janet Mirembe', 'Thunderbirds', 1], ['Aisha Namutebi', 'Impis', 1], ['Patricia Nankunda', 'Ewes', 1], ['Faridah Nakitende', 'She Wolves', 1],
+        ],
+      },
+    },
   } as const;
 
   const rugbySponsorLogos = [
@@ -195,6 +450,142 @@ export default function App() {
 
   const getRegionPanel = (title: string) =>
     desktopRegionPanels.find((panel) => panel.title === title) ?? desktopRegionPanels[0];
+  const toSlug = (value: string) => value.toLowerCase().replace(/&/g, 'and').replace(/\s+/g, '-');
+  const buildRegionRoute = (regionTitle: string, link: string) => `#/regions/${toSlug(regionTitle)}/${toSlug(link)}`;
+  const homeMenuHrefMap: Record<string, string> = {
+    Latest: '#/',
+    Teams: buildRegionRoute('Central', 'Men'),
+    'Age Grade': buildRegionRoute('Schools', 'Boys'),
+    Tournaments: buildRegionRoute('Central', 'Fixtures'),
+    RIU: '#/shop/matchday-wear',
+    'Fixture & Results': buildRegionRoute('Central', 'Fixtures'),
+  };
+  const homeTopMenuPanels = [
+    {
+      label: 'Latest',
+      href: homeMenuHrefMap.Latest,
+      featured: false,
+      links: [
+        { label: 'Homepage', href: '#/' },
+        { label: 'Matchday Wear', href: '#/shop/matchday-wear' },
+        { label: 'Fan Essentials', href: '#/shop/fan-essentials' },
+      ],
+    },
+      {
+        label: 'Teams',
+        href: homeMenuHrefMap.Teams,
+        featured: false,
+        links: [
+          { label: 'Central', href: buildRegionRoute('Central', 'Men') },
+          { label: 'Northern', href: buildRegionRoute('Northern', 'Men') },
+          { label: 'Eastern', href: buildRegionRoute('Eastern', 'Men') },
+          { label: 'Western', href: buildRegionRoute('Western', 'Men') },
+          { label: 'Schools', href: buildRegionRoute('Schools', 'Boys') },
+          { label: 'National Team', href: buildRegionRoute('National Team', 'Men') },
+        ],
+      },
+    {
+      label: 'Tournaments',
+      href: homeMenuHrefMap.Tournaments,
+      featured: false,
+      links: [
+        { label: 'Central Fixtures', href: buildRegionRoute('Central', 'Fixtures') },
+        { label: 'Schools Cup', href: buildRegionRoute('Schools', 'Schools Cup') },
+        { label: 'National Team Fixtures', href: buildRegionRoute('National Team', 'Fixtures') },
+      ],
+    },
+    {
+      label: 'RIU',
+      href: homeMenuHrefMap.RIU,
+      featured: false,
+      links: [
+        { label: 'Matchday Wear', href: '#/shop/matchday-wear' },
+        { label: 'Fan Essentials', href: '#/shop/fan-essentials' },
+        { label: 'Accessories', href: '#/shop/accessories' },
+      ],
+    },
+    {
+      label: 'Fixture & Results',
+      href: homeMenuHrefMap['Fixture & Results'],
+      featured: true,
+      links: [
+        { label: 'Central Fixtures', href: buildRegionRoute('Central', 'Fixtures') },
+        { label: 'Western Fixtures', href: buildRegionRoute('Western', 'Fixtures') },
+        { label: 'National Team Fixtures', href: buildRegionRoute('National Team', 'Fixtures') },
+      ],
+    },
+  ] as const;
+  const submenuPageMap = Object.fromEntries(
+    desktopRegionPanels.flatMap((panel) =>
+      panel.links.map((link) => {
+        const route = buildRegionRoute(panel.title, link);
+        return [
+          route,
+          {
+            route,
+            regionTitle: panel.title,
+            regionSubtitle: panel.subtitle,
+            link,
+            title: `${panel.title} ${link}`,
+            subtitle: `${link} coverage, updates, and content for ${panel.title.toLowerCase()} rugby.`,
+            image: panel.image,
+          },
+        ];
+      }),
+    ),
+  ) as Record<
+    string,
+    {
+      route: string;
+      regionTitle: string;
+      regionSubtitle: string;
+      link: string;
+      title: string;
+      subtitle: string;
+      image: string;
+    }
+  >;
+  const menRegionRoutes = new Set([
+    '#/regions/central/men',
+    '#/regions/northern/men',
+    '#/regions/eastern/men',
+    '#/regions/western/men',
+    '#/regions/national-team/men',
+  ]);
+  const isHomepageCloneRoute = menRegionRoutes.has(routeHash);
+  const isCentralMenRoute = routeHash === '#/regions/central/men';
+  const activeSubmenuPage = submenuPageMap[routeHash];
+  const clubRouteMatch = routeHash.match(/^#\/clubs\/([^/]+)\/([^/]+)\/([^/]+)$/);
+  const activeClub = clubRouteMatch ? findRegionalClub(clubRouteMatch[1], clubRouteMatch[2]) : null;
+  const activeClubTab = clubRouteMatch?.[3] ?? 'news';
+
+  const availableCalendarDates = Array.from(new Set(fixtureResultCards.map((match) => match.fullDate)));
+  const calendarMatches = fixtureResultCards.filter((match) => match.fullDate === selectedCalendarDate);
+  const handleCalendarPick = (date: string) => {
+    setSelectedCalendarDate(date);
+    setSelectedCalendarMonth(date.slice(0, 7));
+
+    const matchIndex = fixtureResultCards.findIndex((match) => match.fullDate === date);
+    if (matchIndex >= 0) {
+      setSelectedFixtureIndex(matchIndex);
+      setFixtureDeckMode('fixtures');
+    }
+  };
+  const availableCalendarMonths = Array.from(new Set(availableCalendarDates.map((date) => date.slice(0, 7))));
+  const [calendarYear, calendarMonth] = selectedCalendarMonth.split('-').map(Number);
+  const firstDayOfMonth = new Date(calendarYear, calendarMonth - 1, 1);
+  const daysInMonth = new Date(calendarYear, calendarMonth, 0).getDate();
+  const firstWeekday = firstDayOfMonth.getDay();
+  const monthLabel = firstDayOfMonth.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+  const calendarCells = Array.from({ length: firstWeekday + daysInMonth }, (_, index) => {
+    if (index < firstWeekday) return null;
+    const day = index - firstWeekday + 1;
+    const fullDate = `${selectedCalendarMonth}-${String(day).padStart(2, '0')}`;
+    const hasGame = availableCalendarDates.includes(fullDate);
+    return { day, fullDate, hasGame };
+  });
+  const selectedPerformanceBoard =
+    performanceBoards[selectedPerformanceLeague][selectedPerformanceDivision as keyof typeof performanceBoards.men][selectedPerformanceMetric];
 
   const merchandisePages = {
     '#/shop/matchday-wear': {
@@ -216,7 +607,6 @@ export default function App() {
       items: ['Water Bottles', 'Wristbands', 'Key Holders', 'Travel Bags'],
     },
   } as const;
-
   const activeMerchPage = merchandisePages[routeHash as keyof typeof merchandisePages];
 
   useEffect(() => {
@@ -234,6 +624,64 @@ export default function App() {
 
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  useEffect(() => {
+    const pendingTarget = window.sessionStorage.getItem('pendingScrollTarget');
+    if (!pendingTarget) {
+      return;
+    }
+
+    const tryScroll = () => {
+      const target = document.getElementById(pendingTarget);
+      if (!target) {
+        return false;
+      }
+
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      window.sessionStorage.removeItem('pendingScrollTarget');
+      return true;
+    };
+
+    if (tryScroll()) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      tryScroll();
+    }, 180);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [routeHash]);
+
+  useEffect(() => {
+    // Make internal route links switch pages immediately on the first click.
+    const handleDocumentNavigation = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+        return;
+      }
+
+      const target = event.target;
+      if (!(target instanceof Element)) {
+        return;
+      }
+
+      const anchor = target.closest('a[href]');
+      if (!(anchor instanceof HTMLAnchorElement)) {
+        return;
+      }
+
+      const href = anchor.getAttribute('href');
+      if (!href || !href.startsWith('#/')) {
+        return;
+      }
+
+      event.preventDefault();
+      window.location.hash = href.slice(1);
+    };
+
+    document.addEventListener('click', handleDocumentNavigation, true);
+    return () => document.removeEventListener('click', handleDocumentNavigation, true);
   }, []);
 
   useEffect(() => {
@@ -337,8 +785,39 @@ export default function App() {
     );
   }
 
+  if (activeClub) {
+    return <ClubProfilePage club={activeClub} activeTab={activeClubTab} />;
+  }
+
+  if (isCentralMenRoute) {
+    return (
+      <CentralMen
+        onBack={() => setRouteHash('#/')}
+        regionCards={regionCards}
+        desktopRegionPanels={desktopRegionPanels}
+        mobileMenuItems={mobileMenuItems}
+        buildRegionRoute={buildRegionRoute}
+      />
+    );
+  }
+
+  if (activeSubmenuPage) {
+    return (
+      <div className="min-h-screen bg-[linear-gradient(180deg,#040507_0%,#09111b_22%,#06080d_55%,#030405_100%)] text-white">
+        <RegionalSubPage
+          activePage={activeSubmenuPage}
+          regionCards={regionCards}
+          desktopRegionPanels={desktopRegionPanels}
+          mobileMenuItems={mobileMenuItems}
+          buildRegionRoute={buildRegionRoute}
+          onBack={() => setRouteHash('#/')}
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-[linear-gradient(180deg,#040507_0%,#09111b_22%,#06080d_55%,#030405_100%)] text-white">
+    <div data-page={isHomepageCloneRoute ? 'home-clone' : 'home'} className="min-h-screen bg-[linear-gradient(180deg,#040507_0%,#09111b_22%,#06080d_55%,#030405_100%)] text-white">
       {/* Top Bar */}
       <div className="relative z-30 isolate border-t-4 border-b border-[#0f4aa6] bg-[linear-gradient(90deg,#050607_0%,#0a1320_48%,#10140f_100%)] px-2 py-2 text-white sm:px-3">
         <div className="flex w-full items-center gap-2 rounded-full border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] px-2 py-1.5 shadow-[0_10px_26px_rgba(0,0,0,0.22)] backdrop-blur-xl">
@@ -366,52 +845,30 @@ export default function App() {
       </div>
 
       {/* Header */}
-      <header className="relative z-30 isolate border-b border-white/10 bg-[linear-gradient(180deg,rgba(4,6,9,0.96),rgba(8,12,18,0.92))] px-4 py-4 text-white shadow-[0_18px_40px_rgba(0,0,0,0.22)] backdrop-blur-xl sm:px-6 lg:px-8">
+      <header className="relative z-[70] isolate border-b border-white/10 bg-[linear-gradient(180deg,rgba(4,6,9,0.96),rgba(8,12,18,0.92))] px-4 py-4 text-white shadow-[0_18px_40px_rgba(0,0,0,0.22)] backdrop-blur-xl sm:px-6 lg:px-8">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center justify-between gap-3">
-            <img src="/logo-cutout.png" alt="Rugby in Uganda" className="h-20 w-auto object-contain sm:h-24 lg:h-28" />
-            <div className="flex flex-col items-end gap-2">
-              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-white/80">
+          <div className="flex items-center gap-4 sm:gap-6">
+            <a href="#/" className="inline-flex shrink-0 items-center">
+              <img src="/logo-cutout.png" alt="Rugby in Uganda" className="h-20 w-auto object-contain sm:h-24 lg:h-28" />
+            </a>
+            <div className="min-w-0">
+              <span className="block text-[11px] font-semibold uppercase tracking-[0.2em] text-white/80">
                 Our Partners
               </span>
-              <div className="flex flex-wrap items-center justify-end gap-2">
-                <div className="flex h-10 min-w-[74px] items-center justify-center rounded-full border border-white/10 bg-[linear-gradient(180deg,#173e7a_0%,#0f2c59_100%)] px-3 text-sm font-black italic text-white shadow-[0_10px_20px_rgba(15,44,89,0.24)]">
+              <div className="mt-2 flex flex-nowrap items-center gap-1.5">
+                <div className="flex h-9 min-w-[60px] shrink-0 items-center justify-center rounded-full border border-white/10 bg-[linear-gradient(180deg,#173e7a_0%,#0f2c59_100%)] px-2.5 text-[11px] font-black italic text-white shadow-[0_10px_20px_rgba(15,44,89,0.24)]">
                   macron
                 </div>
-                <div className="flex h-10 min-w-[74px] items-center justify-center rounded-full border border-white/10 bg-[linear-gradient(180deg,#173e7a_0%,#0f2c59_100%)] px-3 text-xs font-bold text-white shadow-[0_10px_20px_rgba(15,44,89,0.24)]">
+                <div className="flex h-9 min-w-[60px] shrink-0 items-center justify-center rounded-full border border-white/10 bg-[linear-gradient(180deg,#173e7a_0%,#0f2c59_100%)] px-2.5 text-[10px] font-bold text-white shadow-[0_10px_20px_rgba(15,44,89,0.24)]">
                   HSBC
                 </div>
-                <div className="flex h-10 min-w-[74px] items-center justify-center rounded-full border border-white/10 bg-[linear-gradient(180deg,#173e7a_0%,#0f2c59_100%)] px-3 text-xs font-bold tracking-wide text-white shadow-[0_10px_20px_rgba(15,44,89,0.24)]">
+                <div className="flex h-9 min-w-[60px] shrink-0 items-center justify-center rounded-full border border-white/10 bg-[linear-gradient(180deg,#173e7a_0%,#0f2c59_100%)] px-2.5 text-[10px] font-bold tracking-wide text-white shadow-[0_10px_20px_rgba(15,44,89,0.24)]">
                   NILE
                 </div>
               </div>
             </div>
           </div>
-          <nav className="hidden md:flex md:justify-end">
-            <div className="flex items-center gap-3 rounded-full border border-white/10 bg-black/18 px-3 py-2 text-base font-semibold text-white backdrop-blur-md">
-              <a href="#" className="flex items-center gap-2 rounded-full px-4 py-2 transition-colors hover:bg-white/8 hover:text-white">
-                <span>Latest</span>
-                <ChevronDown size={18} />
-              </a>
-              <a href="#" className="flex items-center gap-2 rounded-full px-4 py-2 transition-colors hover:bg-white/8 hover:text-white">
-                <span>Teams</span>
-                <ChevronDown size={18} />
-              </a>
-              <a href="#" className="rounded-full px-4 py-2 transition-colors hover:bg-white/8 hover:text-white">Age Grade</a>
-              <a href="#" className="flex items-center gap-2 rounded-full px-4 py-2 transition-colors hover:bg-white/8 hover:text-white">
-                <span>Tournaments</span>
-                <ChevronDown size={18} />
-              </a>
-              <a href="#" className="flex items-center gap-2 rounded-full px-4 py-2 transition-colors hover:bg-white/8 hover:text-white">
-                <span>RIU</span>
-                <ChevronDown size={18} />
-              </a>
-              <a href="#" className="flex items-center gap-2 rounded-full bg-[linear-gradient(90deg,#ef2d2d_0%,#ff6d3f_100%)] px-4 py-2 text-white shadow-[0_12px_24px_rgba(239,45,45,0.2)] transition-transform hover:-translate-y-0.5">
-                <span>Fixture & Results</span>
-                <ChevronDown size={18} />
-              </a>
-            </div>
-          </nav>
+          <DesktopTopNav menus={homeTopMenuPanels} standaloneLink={{ label: 'Age Grade', href: homeMenuHrefMap['Age Grade'] }} />
         </div>
       </header>
 
@@ -449,14 +906,11 @@ export default function App() {
           </div>
           {isMobileMenuOpen ? (
             <div className="border-t border-white/10 bg-black px-4 py-4">
-              <div className="grid grid-cols-2 gap-3 text-sm font-semibold text-white">
-                {mobileMenuItems.map((item) => (
-                  <a key={item.label} href="#" className="flex items-center justify-between rounded-md border border-white/10 bg-white/5 px-3 py-3 transition-colors hover:bg-white/10">
-                    <span>{item.label}</span>
-                    {item.hasDropdown ? <ChevronDown size={14} /> : null}
-                  </a>
-                ))}
-              </div>
+              <MobileTopNav
+                menus={homeTopMenuPanels}
+                standaloneLink={{ label: 'Age Grade', href: homeMenuHrefMap['Age Grade'] }}
+                onNavigate={() => setIsMobileMenuOpen(false)}
+              />
             </div>
           ) : null}
         </div>
@@ -490,15 +944,20 @@ export default function App() {
                       <div className="px-4 py-3">
                         <div className="flex min-h-[312px] flex-col">
                           {regionPanel.links.map((link, index) => (
-                            <a
+                            <button
                               key={link}
-                              href="#"
-                              className={`flex flex-1 items-center text-sm font-semibold text-white transition-colors hover:text-[#d6cf77] ${
+                              type="button"
+                              onMouseDown={(event) => handleImmediateRegionalNavigation(event, buildRegionRoute(item.title, link))}
+                              onTouchStart={(event) => handleImmediateRegionalNavigation(event, buildRegionRoute(item.title, link))}
+                              onClick={(event) => {
+                                event.preventDefault();
+                              }}
+                              className={`flex flex-1 items-center text-left text-sm font-semibold text-white transition-colors hover:text-[#d6cf77] ${
                                 index < regionPanel.links.length - 1 ? 'border-b border-white/15' : ''
                               }`}
                             >
                               {link}
-                            </a>
+                            </button>
                           ))}
                         </div>
                       </div>
@@ -521,18 +980,46 @@ export default function App() {
         </div>
 
         {/* Sub Nav Overlay */}
-        <div className="absolute top-0 left-0 hidden w-full border-b border-white/10 bg-[linear-gradient(180deg,rgba(4,8,12,0.7),rgba(4,8,12,0.38))] backdrop-blur-md md:block">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-6 divide-x divide-white/20 text-center text-white">
+        <div className="absolute top-0 left-0 z-40 hidden w-full overflow-visible border-b border-white/10 bg-[linear-gradient(180deg,rgba(4,8,12,0.7),rgba(4,8,12,0.38))] backdrop-blur-md md:block">
+          <div className="container mx-auto overflow-visible px-4">
+            <div className="grid grid-cols-6 divide-x divide-white/20 overflow-visible text-center text-white">
               {desktopRegionPanels.map((item) => (
-                <div key={item.title} className="group relative cursor-pointer py-4 transition-colors hover:bg-white/8">
-                  <div className="mb-1 text-sm font-bold tracking-widest">{item.title.toUpperCase()}</div>
-                  <div className="text-xs tracking-wider text-gray-300">{item.subtitle.toUpperCase()}</div>
+                <div
+                  key={item.title}
+                  className="relative"
+                  onMouseEnter={canUseHover ? () => setOpenDesktopRegion(item.title) : undefined}
+                  onMouseLeave={canUseHover ? () => setOpenDesktopRegion((value) => (value === item.title ? null : value)) : undefined}
+                >
+                <button
+                  type="button"
+                  onMouseDown={(event) => handleImmediateRegionalNavigation(event, getDefaultRegionRoute(item.title))}
+                  onTouchStart={(event) => handleImmediateRegionalNavigation(event, getDefaultRegionRoute(item.title))}
+                  onClick={(event) => {
+                    event.preventDefault();
+                  }}
+                  className={`flex w-full items-center justify-center gap-3 py-4 transition-colors ${
+                      openDesktopRegion === item.title ? 'bg-white/10' : 'hover:bg-white/8'
+                    }`}
+                >
+                    <div>
+                      <div className="mb-1 text-sm font-bold tracking-widest">{item.title.toUpperCase()}</div>
+                      <div className="text-xs tracking-wider text-gray-300">{item.subtitle.toUpperCase()}</div>
+                    </div>
+                  <ChevronDown
+                    size={16}
+                    className={`mt-0.5 transition-transform ${openDesktopRegion === item.title ? 'rotate-180 text-[#f1cf75]' : 'text-white/70'}`}
+                  />
+                </button>
                   <div
                     className={
+                      openDesktopRegion === item.title
+                        ? item.align === 'right'
+                          ? 'absolute top-full right-0 z-50 w-[560px] overflow-hidden border-[6px] border-white bg-[#111315] text-left shadow-2xl'
+                          : 'absolute top-full left-0 z-50 w-[560px] overflow-hidden border-[6px] border-white bg-[#111315] text-left shadow-2xl'
+                        :
                       item.align === 'right'
-                        ? 'absolute top-full right-0 z-20 hidden w-[560px] overflow-hidden border-[6px] border-white bg-[#111315] text-left shadow-2xl group-hover:block'
-                        : 'absolute top-full left-0 z-20 hidden w-[560px] overflow-hidden border-[6px] border-white bg-[#111315] text-left shadow-2xl group-hover:block'
+                        ? 'absolute top-full right-0 z-50 hidden w-[560px] overflow-hidden border-[6px] border-white bg-[#111315] text-left shadow-2xl'
+                        : 'absolute top-full left-0 z-50 hidden w-[560px] overflow-hidden border-[6px] border-white bg-[#111315] text-left shadow-2xl'
                     }
                   >
                     <div
@@ -542,7 +1029,15 @@ export default function App() {
                       <div className="absolute inset-0 bg-black/45" />
                       <div className="relative z-10 w-[220px] bg-black/75 px-8 py-6">
                         {item.links.map((link) => (
-                          <a key={link} href="#" className="block border-b border-white/20 py-4 text-base text-white transition-colors hover:text-[#d6cf77]">
+                          <a
+                            key={link}
+                            href={buildRegionRoute(item.title, link)}
+                            onClick={(event) => {
+                              event.preventDefault();
+                              handleRegionalNavigation(buildRegionRoute(item.title, link));
+                            }}
+                            className="block border-b border-white/20 py-4 text-base text-white transition-colors hover:text-[#d6cf77]"
+                          >
                             {link}
                           </a>
                         ))}
@@ -559,16 +1054,14 @@ export default function App() {
         <div className="absolute inset-x-0 bottom-0 w-full bg-[linear-gradient(90deg,rgba(22,34,27,0.92),rgba(15,29,39,0.92),rgba(33,35,21,0.92))] py-6 backdrop-blur-xl">
           <div className="container mx-auto flex justify-center px-4">
             <div className="flex w-full items-center gap-3 overflow-x-auto whitespace-nowrap rounded-[24px] border border-white/10 bg-black/14 px-3 py-3 pb-1 shadow-[0_18px_40px_rgba(0,0,0,0.2)] md:w-auto md:flex-wrap md:justify-center md:overflow-visible md:whitespace-normal md:pb-3">
+              <a
+                href="#official-kit-drop"
+                className="inline-flex w-[210px] shrink-0 items-center justify-center border border-white/60 bg-transparent px-4 py-3 text-sm font-medium uppercase text-white transition-colors hover:bg-white/8 md:w-auto md:py-2 md:text-sm lg:w-44"
+              >
+                Shop
+              </a>
               <div className="relative w-[210px] shrink-0 md:w-auto">
-                <select defaultValue="" className="w-full appearance-none border border-white/60 bg-transparent px-4 py-3 text-lg uppercase text-white focus:border-white focus:outline-none md:py-2 md:text-base lg:w-48">
-                  <option value="" disabled hidden className="text-black">SHOP</option>
-                  <option className="text-black">RIU</option>
-                  <option className="text-black">CLUBS</option>
-                </select>
-                <ChevronDown size={18} className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 transform text-white/90 md:size-[14px]" />
-              </div>
-              <div className="relative w-[210px] shrink-0 md:w-auto">
-                <select defaultValue="" className="w-full appearance-none border border-white/60 bg-transparent px-4 py-3 text-lg uppercase text-white focus:border-white focus:outline-none md:py-2 md:text-base lg:w-48">
+                <select defaultValue="" className="w-full appearance-none border border-white/60 bg-transparent px-4 py-3 text-sm uppercase text-white focus:border-white focus:outline-none md:py-2 md:text-sm lg:w-44">
                   <option value="" disabled hidden className="text-black">EVENTS</option>
                   <option className="text-black">ON GOING</option>
                   <option className="text-black">UP COMING</option>
@@ -587,9 +1080,9 @@ export default function App() {
                       document.getElementById('fixtures-results-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     });
                   }}
-                  className="w-full appearance-none border border-white/60 bg-transparent px-4 py-3 text-lg uppercase text-white focus:border-white focus:outline-none md:py-2 md:text-base lg:w-40"
+                  className="w-full appearance-none border border-white/60 bg-transparent px-4 py-3 text-sm uppercase text-white focus:border-white focus:outline-none md:py-2 md:text-sm lg:w-44"
                 >
-                  <option value="" disabled hidden className="text-black">TABLE STANDINGS</option>
+                  <option value="" disabled hidden className="text-black">TABLES</option>
                   <option className="text-black">Premiership</option>
                   <option className="text-black">Eastern</option>
                   <option className="text-black">Northern</option>
@@ -599,7 +1092,7 @@ export default function App() {
                 <ChevronDown size={18} className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 transform text-white/90 md:size-[14px]" />
               </div>
               <div className="relative w-[210px] shrink-0 md:w-auto">
-                <select defaultValue="" className="w-full appearance-none border border-white/60 bg-transparent px-4 py-3 text-lg uppercase text-white focus:border-white focus:outline-none md:py-2 md:text-base lg:w-40">
+                <select defaultValue="" className="w-full appearance-none border border-white/60 bg-transparent px-4 py-3 text-sm uppercase text-white focus:border-white focus:outline-none md:py-2 md:text-sm lg:w-44">
                   <option value="" disabled hidden className="text-black">NEWS</option>
                   <option className="text-black">ALL NEWS</option>
                   <option className="text-black">LATEST NEWS</option>
@@ -607,10 +1100,29 @@ export default function App() {
                 <ChevronDown size={18} className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 transform text-white/90 md:size-[14px]" />
               </div>
               <div className="relative w-[210px] shrink-0 md:w-auto">
-                <input type="text" placeholder="CALENDAR" className="w-full border border-white/60 bg-transparent px-4 py-3 text-lg uppercase text-white placeholder-white/90 focus:border-white focus:outline-none md:py-2 md:text-base lg:w-40" />
-                <Calendar size={18} className="absolute top-1/2 right-4 -translate-y-1/2 transform text-white/90 md:size-[14px]" />
+                <select
+                  defaultValue=""
+                  onChange={(event) => {
+                    const metric = event.target.value as 'most tries' | 'most points' | 'motm awards' | '';
+                    if (!metric) return;
+                    setSelectedPerformanceMetric(metric);
+                    setSelectedPerformanceDivision(selectedStandingsDivision);
+                    setSelectedPerformanceLeague(selectedStandingsLeague);
+                    setFixtureDeckMode('performance');
+                    window.requestAnimationFrame(() => {
+                      document.getElementById('fixtures-results-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    });
+                  }}
+                  className="w-full appearance-none border border-white/60 bg-transparent px-4 py-3 text-[17px] uppercase text-white focus:border-white focus:outline-none md:py-2 md:text-sm lg:w-44"
+                >
+                  <option value="" disabled hidden className="text-black">PERFORMANCE</option>
+                  <option value="most tries" className="text-black">MOST TRIES</option>
+                  <option value="most points" className="text-black">MOST POINTS</option>
+                  <option value="motm awards" className="text-black">MOTM AWARDS</option>
+                </select>
+                <ChevronDown size={18} className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 transform text-white/90 md:size-[14px]" />
               </div>
-              <button className="w-[210px] shrink-0 whitespace-nowrap bg-[#d93838] px-6 py-3 text-lg font-bold text-white transition-colors hover:bg-red-700 md:w-auto md:px-8 md:py-2.5 md:text-base">
+              <button className="w-[210px] shrink-0 whitespace-nowrap bg-[#d93838] px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-red-700 md:w-auto md:px-8 md:py-2.5 md:text-sm lg:w-44">
                 Partner With Us
               </button>
             </div>
@@ -643,7 +1155,7 @@ export default function App() {
             <div className="grid grid-cols-1 gap-5 p-4 sm:p-5 lg:p-7">
               <div className="mx-auto w-full max-w-[560px] pt-4 sm:pt-6">
                 <div className="mb-5 flex justify-center">
-                  <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/24 px-3 py-2 shadow-[0_12px_24px_rgba(0,0,0,0.14)] backdrop-blur-md">
+                  <div className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-black/24 px-3 py-2 shadow-[0_12px_24px_rgba(0,0,0,0.14)] backdrop-blur-md">
                   <a
                     href="#"
                     onClick={(event) => {
@@ -672,6 +1184,20 @@ export default function App() {
                   >
                     Results
                   </a>
+                  <a
+                    href="#"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      setFixtureDeckMode('calendar');
+                    }}
+                    className={`rounded-full px-4 py-2 text-center text-sm font-black uppercase tracking-[0.16em] transition-all sm:px-5 sm:text-base ${
+                      fixtureDeckMode === 'calendar'
+                        ? 'bg-[#0f4aa6] text-white shadow-[0_10px_22px_rgba(15,74,166,0.26)]'
+                        : 'text-white hover:text-[#f1cf75]'
+                    }`}
+                  >
+                    Calendar
+                  </a>
                   </div>
                 </div>
                 {fixtureDeckMode === 'standings' ? (
@@ -681,33 +1207,205 @@ export default function App() {
                         <div className="text-[11px] font-black uppercase tracking-[0.16em] text-[#f1cf75]">Table Standings</div>
                         <div className="mt-1 text-xl font-black uppercase tracking-[0.04em] text-white">{selectedStandingsDivision}</div>
                       </div>
-                      <div className="rounded-full border border-white/10 bg-white/8 px-3 py-2 text-[10px] font-black uppercase tracking-[0.16em] text-white/76">
-                        Live Table
+                      <button
+                        type="button"
+                        onClick={() => setSelectedStandingsLeague((current) => (current === 'men' ? 'women' : 'men'))}
+                        className="rounded-full border border-white/10 bg-white/8 px-3 py-2 text-[10px] font-black uppercase tracking-[0.16em] text-white/76 transition-colors hover:bg-white/12"
+                      >
+                        {selectedStandingsLeague === 'men' ? 'Women' : 'Men'}
+                      </button>
+                    </div>
+
+                    <div className="mt-4 space-y-3">
+                      {(selectedStandingsLeague === 'women'
+                        ? womensStandingsByDivision[selectedStandingsDivision as keyof typeof womensStandingsByDivision]
+                        : standingsByDivision[selectedStandingsDivision as keyof typeof standingsByDivision]
+                      ).map((row) => (
+                        <div
+                          key={`${selectedStandingsLeague}-${selectedStandingsDivision}-${row.rank}-${row.team}`}
+                          className="rounded-[16px] border border-white/10 bg-white px-3 py-3 text-[#17304b] shadow-[0_10px_22px_rgba(0,0,0,0.12)]"
+                        >
+                          <div className="grid grid-cols-[34px_minmax(0,1fr)_26px_26px_26px_26px_34px] items-center gap-2 sm:grid-cols-[40px_minmax(0,1fr)_32px_32px_32px_32px_40px] sm:gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[linear-gradient(180deg,#17304b_0%,#0f1f34_100%)] text-sm font-black text-white">
+                              {row.rank}
+                            </div>
+                            <div className="min-w-0">
+                              <div className="truncate text-sm font-black uppercase tracking-[0.04em]">{row.team}</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-[11px] font-black uppercase tracking-[0.12em] text-[#17304b] sm:text-[12px]">P</div>
+                              <div className="mt-1 text-sm font-black">{row.played}</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-[11px] font-black uppercase tracking-[0.12em] text-[#11c95b] sm:text-[12px]">W</div>
+                              <div className="mt-1 text-sm font-black">{row.won}</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-[11px] font-black uppercase tracking-[0.12em] text-[#f4a71d] sm:text-[12px]">D</div>
+                              <div className="mt-1 text-sm font-black">{row.drawn}</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-[11px] font-black uppercase tracking-[0.12em] text-[#e10f21] sm:text-[12px]">L</div>
+                              <div className="mt-1 text-sm font-black">{row.lost}</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-[11px] font-black uppercase tracking-[0.12em] text-[#0f4aa6] sm:text-[12px]">Pts</div>
+                              <div className="mt-1 text-sm font-black">{row.points}</div>
+                            </div>
+                          </div>
+
+                          <div className="mt-3 border-t border-[#17304b]/8 pt-3">
+                            <div className="mb-2 text-[10px] font-black uppercase tracking-[0.16em] text-[#5d6b7b]">Form</div>
+                            <div className="flex flex-wrap gap-2">
+                              {row.form.map((item, formIndex) => (
+                                <div
+                                  key={`${row.team}-form-${formIndex}-${item}`}
+                                  className={`flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-black uppercase text-white ${
+                                    item === 'W'
+                                      ? 'bg-[#11c95b]'
+                                      : item === 'L'
+                                        ? 'bg-[#e10f21]'
+                                        : 'bg-[#ffc21a] text-[#17304b]'
+                                  }`}
+                                >
+                                  {item}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : fixtureDeckMode === 'performance' ? (
+                  <div className="rounded-[18px] border border-white/10 bg-[linear-gradient(180deg,rgba(6,16,27,0.82),rgba(10,20,34,0.68))] p-4 text-white shadow-[0_18px_36px_rgba(0,0,0,0.18)] backdrop-blur-md">
+                    <div className="flex flex-col gap-3 border-b border-white/10 pb-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <div className="text-[11px] font-black uppercase tracking-[0.16em] text-[#f1cf75]">Performance</div>
+                          <div className="mt-1 text-xl font-black uppercase tracking-[0.04em] text-white">{selectedPerformanceMetric}</div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedPerformanceLeague((current) => (current === 'men' ? 'women' : 'men'))}
+                          className="rounded-full border border-white/10 bg-white/8 px-3 py-2 text-[10px] font-black uppercase tracking-[0.16em] text-white/76 transition-colors hover:bg-white/12"
+                        >
+                          {selectedPerformanceLeague === 'men' ? 'Women' : 'Men'}
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {(['Premiership', 'Eastern', 'Northern', 'Western', 'Central'] as const).map((division) => (
+                          <button
+                            key={`performance-${division}`}
+                            type="button"
+                            onClick={() => setSelectedPerformanceDivision(division)}
+                            className={`rounded-full px-3 py-2 text-[10px] font-black uppercase tracking-[0.16em] transition-all ${
+                              selectedPerformanceDivision === division
+                                ? 'bg-[#f1cf75] text-[#13253e] shadow-[0_10px_22px_rgba(241,207,117,0.22)]'
+                                : 'border border-white/10 bg-white/8 text-white/78 hover:bg-white/12'
+                            }`}
+                          >
+                            {division}
+                          </button>
+                        ))}
                       </div>
                     </div>
 
                     <div className="mt-4 space-y-3">
-                      {standingsByDivision[selectedStandingsDivision as keyof typeof standingsByDivision].map((row) => (
+                      {selectedPerformanceBoard.map(([name, team, value], index) => (
                         <div
-                          key={`${selectedStandingsDivision}-${row.rank}-${row.team}`}
-                          className="grid grid-cols-[40px_1fr_auto_auto] items-center gap-3 rounded-[14px] border border-white/10 bg-white px-3 py-3 text-[#17304b] shadow-[0_10px_22px_rgba(0,0,0,0.12)]"
+                          key={`${selectedPerformanceLeague}-${selectedPerformanceDivision}-${selectedPerformanceMetric}-${name}-${index}`}
+                          className="grid grid-cols-[42px_1fr_auto] items-center gap-3 rounded-[16px] border border-white/10 bg-white px-3 py-3 text-[#17304b] shadow-[0_10px_22px_rgba(0,0,0,0.12)]"
                         >
                           <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[linear-gradient(180deg,#17304b_0%,#0f1f34_100%)] text-sm font-black text-white">
-                            {row.rank}
+                            {index + 1}
                           </div>
-                          <div className="min-w-0">
-                            <div className="truncate text-sm font-black uppercase tracking-[0.04em]">{row.team}</div>
-                          </div>
-                          <div className="text-center">
-                            <div className="text-[10px] font-black uppercase tracking-[0.12em] text-[#5d6b7b]">P</div>
-                            <div className="mt-1 text-sm font-black">{row.played}</div>
+                          <div className="min-w-0 text-left">
+                            <div className="truncate text-sm font-black uppercase tracking-[0.04em]">
+                              {name}
+                              <span className="mx-2 text-[#5d6b7b]">-</span>
+                              <span className="text-[11px] font-bold tracking-[0.08em] text-[#5d6b7b]">{team}</span>
+                            </div>
                           </div>
                           <div className="text-right">
-                            <div className="text-[10px] font-black uppercase tracking-[0.12em] text-[#5d6b7b]">Pts</div>
-                            <div className="mt-1 text-sm font-black">{row.points}</div>
+                            <div className="text-[10px] font-black uppercase tracking-[0.12em] text-[#5d6b7b]">
+                              {selectedPerformanceMetric === 'most tries' ? 'Tries' : selectedPerformanceMetric === 'most points' ? 'Pts' : 'MOTM'}
+                            </div>
+                            <div className="mt-1 text-lg font-black text-[#0f4aa6]">{value}</div>
                           </div>
                         </div>
                       ))}
+                    </div>
+                  </div>
+                ) : fixtureDeckMode === 'calendar' ? (
+                  <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(5,7,11,0.94),rgba(4,6,10,0.9))] p-4 text-white shadow-[0_18px_36px_rgba(0,0,0,0.18)] backdrop-blur-md sm:p-5">
+                    <div className="mx-auto max-w-[470px]">
+                      <div className="mb-4 flex items-center justify-between gap-3">
+                        <div className="text-[11px] font-black uppercase tracking-[0.18em] text-[#f1cf75]">Match Calendar</div>
+                        <div className="flex items-center gap-2">
+                          {availableCalendarMonths.map((month) => (
+                            <button
+                              key={month}
+                              type="button"
+                              onClick={() => setSelectedCalendarMonth(month)}
+                              className={`rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.16em] transition-all ${
+                                selectedCalendarMonth === month
+                                  ? 'bg-[#ff4f93] text-white shadow-[0_10px_20px_rgba(255,79,147,0.22)]'
+                                  : 'border border-white/10 bg-white/6 text-white/72'
+                              }`}
+                            >
+                              {new Date(`${month}-01T00:00:00`).toLocaleDateString('en-US', { month: 'short' })}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="rounded-[20px] border border-white/10 bg-black/40 px-4 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+                        <div className="text-center text-[18px] font-black uppercase tracking-[0.12em] text-white sm:text-[24px]">
+                          {monthLabel}
+                        </div>
+
+                        <div className="mt-5 grid grid-cols-7 gap-y-3 text-center text-[11px] font-black uppercase tracking-[0.18em] text-white/46">
+                          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day) => (
+                            <div key={`weekday-${day}`}>{day}</div>
+                          ))}
+                        </div>
+
+                        <div className="mt-4 grid grid-cols-7 gap-x-2 gap-y-3">
+                          {calendarCells.map((cell, index) =>
+                            cell ? (
+                              <button
+                                key={cell.fullDate}
+                                type="button"
+                                onClick={() => cell.hasGame && handleCalendarPick(cell.fullDate)}
+                                className={`relative flex aspect-square items-center justify-center rounded-[14px] border text-sm font-black transition-all ${
+                                  cell.fullDate === selectedCalendarDate
+                                    ? 'border-white/40 bg-[#ff4f93] text-white shadow-[0_10px_24px_rgba(255,79,147,0.24)]'
+                                    : cell.hasGame
+                                      ? 'border-white/14 bg-white/[0.03] text-white hover:border-[#11c95b]/40 hover:bg-white/[0.07]'
+                                      : 'border-transparent bg-transparent text-white/86'
+                                }`}
+                              >
+                                <span>{cell.day}</span>
+                                {cell.hasGame ? (
+                                  <span
+                                    className={`absolute bottom-1.5 left-1/2 h-[4px] w-[72%] -translate-x-1/2 rounded-full ${
+                                      cell.fullDate === selectedCalendarDate ? 'bg-white/90' : 'bg-[#11c95b]'
+                                    }`}
+                                  />
+                                ) : null}
+                              </button>
+                            ) : (
+                              <div key={`empty-${index}`} />
+                            ),
+                          )}
+                        </div>
+
+                        <div className="mt-4 text-center text-xs font-semibold text-white/58">
+                          Dates with a green line have games scheduled.
+                        </div>
+                      </div>
+
                     </div>
                   </div>
                 ) : (
@@ -736,7 +1434,7 @@ export default function App() {
                             <div className="flex items-center justify-between gap-3 text-[11px] font-bold uppercase tracking-[0.08em] lg:text-xs">
                               <span className="rounded-full bg-[#17304b]/6 px-3 py-1 text-[#17304b]">{match.stage}</span>
                               <span className="text-[#17304b]">
-                                {fixtureDeckMode === 'fixtures' ? `${match.date} ${match.time}` : match.resultStatus}
+                                {fixtureDeckMode === 'results' ? match.resultStatus : `${match.date} ${match.time}`}
                               </span>
                             </div>
                             <div className="mt-5 lg:mt-7">
@@ -745,7 +1443,7 @@ export default function App() {
                               </div>
                             </div>
                             <div className="mt-5 text-[17px] font-black uppercase leading-tight tracking-[0.04em] lg:text-[21px]">{match.home}</div>
-                            {fixtureDeckMode === 'fixtures' ? (
+                            {fixtureDeckMode !== 'results' ? (
                               <div className="mt-3 text-[42px] font-black uppercase leading-none text-[#ff4f93] lg:text-[52px]">VS</div>
                             ) : (
                               <div className="mt-3 text-[34px] font-black uppercase leading-none text-[#ff4f93] lg:text-[42px]">
@@ -762,11 +1460,13 @@ export default function App() {
                               Venue: {match.venue}
                             </div>
                             <div className={`mt-5 inline-flex rounded-[10px] px-6 py-3 text-sm font-black text-white lg:mt-7 lg:px-7 lg:py-3.5 ${
-                              fixtureDeckMode === 'fixtures'
-                                ? 'bg-[linear-gradient(180deg,#17304b_0%,#12243c_100%)] shadow-[0_10px_22px_rgba(18,36,60,0.18)]'
-                                : 'bg-[linear-gradient(180deg,#ff4f93_0%,#ff2e7d_100%)] shadow-[0_10px_22px_rgba(255,79,147,0.22)]'
+                              fixtureDeckMode === 'results'
+                                ? 'bg-[linear-gradient(180deg,#ff4f93_0%,#ff2e7d_100%)] shadow-[0_10px_22px_rgba(255,79,147,0.22)]'
+                                : fixtureDeckMode === 'calendar'
+                                  ? 'bg-[linear-gradient(180deg,#0f4aa6_0%,#123870_100%)] shadow-[0_10px_22px_rgba(15,74,166,0.22)]'
+                                  : 'bg-[linear-gradient(180deg,#17304b_0%,#12243c_100%)] shadow-[0_10px_22px_rgba(18,36,60,0.18)]'
                             }`}>
-                              {fixtureDeckMode === 'fixtures' ? match.status : match.resultStatus}
+                              {fixtureDeckMode === 'results' ? match.resultStatus : fixtureDeckMode === 'calendar' ? 'Add To Calendar' : match.status}
                             </div>
                           </div>
                         ) : (
@@ -775,7 +1475,7 @@ export default function App() {
                               {match.stage}
                             </div>
                             <div className="text-sm font-semibold lg:text-base">
-                              {fixtureDeckMode === 'fixtures' ? match.date : `${match.homeScore}-${match.awayScore}`}
+                              {fixtureDeckMode === 'results' ? `${match.homeScore}-${match.awayScore}` : match.date}
                             </div>
                           </div>
                         )}
@@ -789,6 +1489,7 @@ export default function App() {
             </div>
           </div>
 
+          {!isHomepageCloneRoute && (
           <div className="bg-[rgba(255,255,255,0.9)] p-2 shadow-[0_24px_60px_rgba(0,0,0,0.18)] sm:p-3">
             <div
               className="relative overflow-hidden rounded-[24px] border border-[#f3a51b]/50 px-5 py-6 sm:px-8 sm:py-8"
@@ -923,9 +1624,12 @@ export default function App() {
               </div>
             </div>
           </div>
+          )}
         </div>
       </section>
 
+      {!isHomepageCloneRoute && (
+      <>
       {/* Activities Section */}
       <section className="relative mt-8 overflow-hidden bg-[#050505] pt-14 pb-18 sm:mt-10 sm:pt-18 sm:pb-24">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(214,163,39,0.16),transparent_22%),radial-gradient(circle_at_bottom_right,rgba(15,74,166,0.22),transparent_28%),linear-gradient(180deg,#040404_0%,#090909_100%)]" />
@@ -1029,7 +1733,7 @@ export default function App() {
       </section>
 
       {/* Promo Section */}
-      <section className="section-font-fixed relative overflow-hidden bg-[#e5dccb] px-4 py-14 sm:px-6 sm:py-20">
+      <section id="official-kit-drop" className="section-font-fixed relative overflow-hidden bg-[#e5dccb] px-4 py-14 sm:px-6 sm:py-20">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-38"
           style={{ backgroundImage: "url('/slider/two.jpeg')" }}
@@ -1433,89 +2137,10 @@ export default function App() {
           </div>
         </div>
       </section>
+      </>
+      )}
 
-      {/* Footer */}
-      <footer className="border-t border-white/10 bg-[#121212] text-white">
-        <div className="grid grid-cols-1 border-b border-white/10 lg:grid-cols-[1.15fr_1fr_1fr_1fr_1fr]">
-          <div className="flex flex-col items-center justify-start border-b border-white/10 px-8 py-10 text-center md:border-b-0 md:border-r">
-            <img src="/logo-cutout.png" alt="Rugby in Uganda" className="-mt-3 h-[270px] w-auto object-contain" />
-            <div className="mx-auto -mt-2 max-w-sm space-y-2 text-center">
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-white/55">Rugby In Uganda</p>
-              <p className="text-base leading-relaxed text-white/80">
-                Home of regional rugby, schools rugby, national team updates, fixtures, standings, and partner opportunities.
-              </p>
-            </div>
-          </div>
-
-          <div className="border-b border-white/10 px-8 py-10 md:border-b-0 md:border-r">
-            <p className="mb-6 text-sm font-semibold uppercase tracking-[0.2em] text-white/55">Explore</p>
-            <ul className="grid grid-cols-2 gap-x-6 gap-y-7 text-lg md:block md:space-y-7">
-              <li><a href="#" className="transition-colors hover:text-[#d6a327]">Latest</a></li>
-              <li><a href="#" className="transition-colors hover:text-[#d6a327]">Teams</a></li>
-              <li><a href="#" className="transition-colors hover:text-[#d6a327]">Age Grade</a></li>
-              <li><a href="#" className="transition-colors hover:text-[#d6a327]">Tournaments</a></li>
-              <li><a href="#" className="transition-colors hover:text-[#d6a327]">RIU</a></li>
-              <li><a href="#" className="transition-colors hover:text-[#d6a327]">Fixture & Results</a></li>
-            </ul>
-          </div>
-
-          <div className="border-b border-white/10 px-8 py-10 md:border-b-0 md:border-r">
-            <p className="mb-6 text-sm font-semibold uppercase tracking-[0.2em] text-white/55">Regions</p>
-            <ul className="grid grid-cols-2 gap-x-6 gap-y-7 text-lg md:block md:space-y-7">
-              <li><a href="#" className="transition-colors hover:text-[#d6a327]">Central</a></li>
-              <li><a href="#" className="transition-colors hover:text-[#d6a327]">Northern</a></li>
-              <li><a href="#" className="transition-colors hover:text-[#d6a327]">Eastern</a></li>
-              <li><a href="#" className="transition-colors hover:text-[#d6a327]">Western</a></li>
-              <li><a href="#" className="transition-colors hover:text-[#d6a327]">Schools</a></li>
-              <li><a href="#" className="transition-colors hover:text-[#d6a327]">National Team</a></li>
-            </ul>
-          </div>
-
-          <div className="border-b border-white/10 px-8 py-10 md:border-b-0 md:border-r">
-            <p className="mb-6 text-sm font-semibold uppercase tracking-[0.2em] text-white/55">Services</p>
-            <ul className="grid grid-cols-2 gap-x-6 gap-y-7 text-lg md:block md:space-y-7">
-              <li><a href="#" className="transition-colors hover:text-[#d6a327]">Shop</a></li>
-              <li><a href="#" className="transition-colors hover:text-[#d6a327]">Events</a></li>
-              <li><a href="#" className="transition-colors hover:text-[#d6a327]">Table Standings</a></li>
-              <li><a href="#" className="transition-colors hover:text-[#d6a327]">News</a></li>
-              <li><a href="#" className="transition-colors hover:text-[#d6a327]">Calendar</a></li>
-              <li><a href="#" className="transition-colors hover:text-[#d6a327]">Partner With Us</a></li>
-            </ul>
-          </div>
-
-          <div className="border-b border-white/10 px-8 py-10 md:border-b-0 md:border-r">
-            <div className="space-y-6">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/60">Connect</p>
-              <div className="flex items-center gap-4">
-                <a href="#" className="flex h-12 w-12 items-center justify-center rounded-full border border-white/50 transition-colors hover:border-[#d6a327] hover:text-[#d6a327]">
-                  <Facebook size={16} />
-                </a>
-                <a href="#" className="flex h-12 w-12 items-center justify-center rounded-full border border-white/50 transition-colors hover:border-[#d6a327] hover:text-[#d6a327]">
-                  <Send size={16} />
-                </a>
-                <a href="#" className="flex h-12 w-12 items-center justify-center rounded-full border border-white/50 transition-colors hover:border-[#d6a327] hover:text-[#d6a327]">
-                  <Info size={16} />
-                </a>
-              </div>
-              <a href="#" className="inline-flex border border-white px-8 py-4 text-sm font-semibold uppercase tracking-[0.2em] transition-colors hover:bg-white hover:text-black">
-                Subscribe
-              </a>
-            </div>
-          </div>
-
-        </div>
-
-        <div className="flex flex-col gap-6 px-6 py-6 text-sm text-white/80 md:flex-row md:items-center md:justify-between">
-          <p>© 2026 Rugby in Uganda. All rights reserved.</p>
-          <div className="flex flex-wrap gap-4">
-            <a href="#" className="transition-colors hover:text-[#d6a327]">Privacy Policy</a>
-            <span>|</span>
-            <a href="#" className="transition-colors hover:text-[#d6a327]">Terms of Use</a>
-            <span>|</span>
-            <a href="#" className="transition-colors hover:text-[#d6a327]">Cookie Policy</a>
-          </div>
-        </div>
-      </footer>
+      <SharedFooter />
 
       <a
         href="https://wa.me/256773207919"
@@ -1527,3 +2152,4 @@ export default function App() {
     </div>
   );
 }
+
