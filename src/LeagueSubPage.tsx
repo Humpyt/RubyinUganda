@@ -174,28 +174,28 @@ export default function LeagueSubPage({ activePage, onBack }: LeagueSubPageProps
               </div>
             </div>
 
-            <div className="mt-10 grid gap-4 lg:grid-cols-5">
-              <div className="rounded-[22px] border border-white/12 bg-white/6 p-6 backdrop-blur-md">
+            <div className="mt-10 flex gap-4 overflow-x-auto pb-2 [scrollbar-width:thin] snap-x snap-mandatory lg:grid lg:overflow-visible lg:pb-0 lg:snap-none lg:grid-cols-5">
+              <div className="min-w-[280px] snap-start rounded-[22px] border border-white/12 bg-white/6 p-6 backdrop-blur-md lg:min-w-0">
                 <div className="text-[10px] font-black uppercase tracking-[0.18em] text-white/55">Premier League Leaders</div>
                 <div className="mt-3 text-2xl font-black uppercase leading-tight">{leader.team}</div>
                 <div className="mt-2 text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: activePage.accent }}>{leader.points} points</div>
               </div>
-              <div className="rounded-[22px] border border-white/12 bg-white/6 p-6 backdrop-blur-md">
+              <div className="min-w-[280px] snap-start rounded-[22px] border border-white/12 bg-white/6 p-6 backdrop-blur-md lg:min-w-0">
                 <div className="text-[10px] font-black uppercase tracking-[0.18em] text-white/55">Central League Leaders</div>
                 <div className="mt-3 text-2xl font-black uppercase leading-tight">{centralLeader.team}</div>
                 <div className="mt-2 text-xs font-semibold uppercase tracking-[0.14em] text-white/70">{centralLeader.points} points</div>
               </div>
-              <div className="rounded-[22px] border border-white/12 bg-white/6 p-6 backdrop-blur-md">
+              <div className="min-w-[280px] snap-start rounded-[22px] border border-white/12 bg-white/6 p-6 backdrop-blur-md lg:min-w-0">
                 <div className="text-[10px] font-black uppercase tracking-[0.18em] text-white/55">Western League Leaders</div>
                 <div className="mt-3 text-2xl font-black uppercase leading-tight">{westernLeader.team}</div>
                 <div className="mt-2 text-xs font-semibold uppercase tracking-[0.14em] text-white/70">{westernLeader.points} points</div>
               </div>
-              <div className="rounded-[22px] border border-white/12 bg-white/6 p-6 backdrop-blur-md">
+              <div className="min-w-[280px] snap-start rounded-[22px] border border-white/12 bg-white/6 p-6 backdrop-blur-md lg:min-w-0">
                 <div className="text-[10px] font-black uppercase tracking-[0.18em] text-white/55">Northern League Leaders</div>
                 <div className="mt-3 text-2xl font-black uppercase leading-tight">{northernLeader.team}</div>
                 <div className="mt-2 text-xs font-semibold uppercase tracking-[0.14em] text-white/70">{northernLeader.points} points</div>
               </div>
-              <div className="rounded-[22px] border border-white/12 bg-white/6 p-6 backdrop-blur-md">
+              <div className="min-w-[280px] snap-start rounded-[22px] border border-white/12 bg-white/6 p-6 backdrop-blur-md lg:min-w-0">
                 <div className="text-[10px] font-black uppercase tracking-[0.18em] text-white/55">Eastern League Leaders</div>
                 <div className="mt-3 text-2xl font-black uppercase leading-tight">{easternLeader.team}</div>
                 <div className="mt-2 text-xs font-semibold uppercase tracking-[0.14em] text-white/70">{easternLeader.points} points</div>
